@@ -230,7 +230,6 @@ class Fighter(pygame.sprite.Sprite):
 
 		dist = utilities.distTo(self.rect.center, self.target)
 		angle = utilities.angleTo(self.rect.center, self.target)
-		print(angle)
 
 		if self.state == "MOVE":
 			self.move(angle)
