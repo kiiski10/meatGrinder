@@ -1,13 +1,18 @@
-import math
-
-def distance(start, end):
-	return math.sqrt((start[0] - end[0]) ** 2 + (start[1] - end[1]) ** 2)
+import pygame, math
 
 def angleDistToPos(pos, angle, dist):
-	return(10, 10)
+	x = pos[0] + (math.cos(angle) * dist)
+	y = pos[1] - (math.sin(angle) * dist)
+	return(x, y)
 
 def distTo(fromPos, toPos):
-	return math.sqrt((fromPos[0] - toPos[0]) ** 2 + (fromPos[1] - toPos[1]) ** 2)
+	dist = math.sqrt((fromPos[0] - toPos[0]) ** 2 + (fromPos[1] - toPos[1]) ** 2)
+	return(dist)
 
 def angleTo(fromPos, toPos):
-	return(10)
+	dx = toPos[0] - fromPos[0]
+	dy = toPos[1] - fromPos[1]
+	rads = math.atan2(dy,dx)
+	rads %= 2*math.pi
+	degs = math.degrees(rads)
+	return(degs)

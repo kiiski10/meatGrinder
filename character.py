@@ -178,7 +178,7 @@ class Fighter(pygame.sprite.Sprite):
 		if self.frame - self.timeStamps["search"] > 15 * (random.randint(1, 10)):
 			self.state = "SEARCH"
 
-		debug = False
+		debug = True
 		if debug and self.target: # target line
 			pygame.draw.line(
 				self.world.debugLayer,
@@ -230,7 +230,7 @@ class Fighter(pygame.sprite.Sprite):
 
 		dist = utilities.distTo(self.rect.center, self.target)
 		angle = utilities.angleTo(self.rect.center, self.target)
-
+		print(angle)
 
 		if self.state == "MOVE":
 			self.move(angle)
