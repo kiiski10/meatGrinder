@@ -64,7 +64,7 @@ def	randomEquipments(n):
 pygame.event.get()
 running = True
 
-plrCount = 50
+plrCount = 4
 c = 0
 for i in range(plrCount):
 	c += 1

@@ -16,3 +16,12 @@ def angleTo(fromPos, toPos):
 	rads %= 2*math.pi
 	degs = math.degrees(rads)
 	return(degs)
+
+def angleDistToPos(pos, angle, dist):
+	movement = pygame.math.Vector2()
+	movement.from_polar((dist, angle))
+	movement.x = int(movement.x)
+	movement.y = int(movement.y)
+	x = movement.x + pos[0]
+	y = movement.y + pos[1]
+	return(x,y)

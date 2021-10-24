@@ -1,6 +1,6 @@
 import random, pygame
 import utilities
-from equipment import Sword, Fist, Shield, Skin
+from equipment import *
 
 pygame.font.init()
 font = pygame.font.SysFont('Monotype', 12)
@@ -15,52 +15,47 @@ SPRITE_ROW_MAPPING = {
 }
 
 equipmentAvailable = {
-	"sword": Sword(),
-	"shield": Shield(),
 	"fist": Fist(),
+	"sword": Sword(),
 	"skin": Skin(),
+	"shield": Shield(),
+	"hair": Hair(),
+	"pants": Pants(),
+	"shirt": Shirt(),
 }
 
 class Fighter(pygame.sprite.Sprite):
 	def __init__(
 			self, speed=1, world=None, selectedEquipment=[],
-			primaryTarget=None, weapon=None, armor=None, team=None,
+			primaryTarget=None, team=None,
 			fighterTiles=None, spawnNr=0
 		):
 
 		print("fighter init")
-		print("equipment", selectedEquipment)
-
-		self.weapon = weapon
-		self.armor = armor
 
 		images = {}
 		for e in selectedEquipment:
+			images[e] = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[e], 0)
+
+			self.equipment = {
+				"weapon": Fist(),
+				"armor": Skin(),
+			}
+
 			if e == "shield":
 				self.armor = equipmentAvailable["shield"]
-
 			elif e == "sword":
 				self.weapon = equipmentAvailable["sword"]
 
-			images[e] = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[e], 0)
+		if not "weapon" in self.equipment:
+			self.equipment["weapon"] = equipmentAvailable["fist"]
 
-		if not self.weapon:
-			self.weapon = equipmentAvailable["fist"]
+		if not "armor" in self.equipment:
+			self.equipment["armor"]  = equipmentAvailable["skin"]
 
-		if not self.armor:
-			self.armor = equipmentAvailable["skin"]
-
-		if images == None:
-			self.images = {}
-		else:
-			self.images = images
-
-		for r in SPRITE_ROW_MAPPING:
-			if r not in self.images:
-				self.images[r] = None
-
+		self.images = images
 		pygame.sprite.Sprite.__init__(self)
-		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING["body"], 0).copy()
+		self.image = fighterTiles.get_tile_image(0, 0, 0).copy() # set naked body sprite as base image
 		self.world = world
 		self.rect = self.image.get_rect()
 		self.rect.center = team["fighterInputs"][spawnNr],
@@ -98,11 +93,7 @@ class Fighter(pygame.sprite.Sprite):
 	def getDetectionRect(self):
 		w = self.enemyDetectionAreaSize
 		h = self.enemyDetectionAreaSize
-		r = pygame.Rect([0, 0], [w, h])
-		r.center = [
-			self.rect.x + self.rect.width,
-			self.rect.y + self.rect.width
-		]
+		r = pygame.Rect(self.rect.center, [w, h])
 		return(r)
 
 
@@ -121,8 +112,6 @@ class Fighter(pygame.sprite.Sprite):
 		else:
 			return(pygame.Rect(self.team["primaryTarget"], (20, 20)))
 
-		print("NO RETURN")
-
 
 	def move(self, angle):
 		self.dir = angle
@@ -132,17 +121,11 @@ class Fighter(pygame.sprite.Sprite):
 		if self.animFrame >= len(self.anim):
 			self.animFrame = 0
 		self.image = self.anim[self.animFrame]
-
-		movement = pygame.math.Vector2()
-		movement.from_polar((1 * self.speed, angle))
-		movement.x = int(movement.x) + random.randint(-3, 3)
-		movement.y = int(movement.y) + random.randint(-3, 3)
-		self.rect.x += movement.x
-		self.rect.y += movement.y
+		self.rect.center = utilities.angleDistToPos(self.rect.center, angle, self.speed)
 
 
 	def takeHit(self, hit):
-		damage = (hit["baseDamage"] * hit["level"]) * self.armor.damageMultiplier
+		damage = (hit["baseDamage"] * hit["level"]) * self.equipment["armor"].damageMultiplier
 		self.health -= damage
 		if self.health <= 0:
 			self.world.dead.append(self)
@@ -153,9 +136,17 @@ class Fighter(pygame.sprite.Sprite):
 		self.timeStamps["hit"] = self.frame
 
 		# 1. define hit area
-		reach = self.weapon.reach
+		reach = self.equipment["weapon"].reach
+		offset = self.rect.width
 		hitArea = pygame.Rect((0,0), (reach,reach))
-		hitArea.center = utilities.angleDistToPos(self.rect.center, angle, self.weapon.reach)
+		hitArea.center = utilities.angleDistToPos(
+			(
+				self.rect.x + offset,
+				self.rect.y + offset
+			),
+			angle,
+			self.equipment["weapon"].reach
+		)
 		self.lastHitArea = hitArea
 
 		# 2. find players in the area
@@ -166,7 +157,7 @@ class Fighter(pygame.sprite.Sprite):
 
 		# 3. deal damage to players
 		for e in enemiesInArea:
-			e.takeHit(self.weapon.hit)
+			e.takeHit(self.equipment["weapon"].hit)
 
 		if len(enemiesInArea) > 0:
 			return(True)
@@ -227,21 +218,20 @@ class Fighter(pygame.sprite.Sprite):
 			self.target = self.findTarget()
 			self.state= "MOVE"
 
-
-		dist = utilities.distTo(self.rect.center, self.target)
-		angle = utilities.angleTo(self.rect.center, self.target)
+		dist = utilities.distTo(self.rect.center, self.target.center)
+		angle = utilities.angleTo(self.rect.center, self.target.center)
 
 		if self.state == "MOVE":
 			self.move(angle)
 
 
 		if self.state == "INFIGHT":
-			if self.frame - self.timeStamps["hit"] > self.weapon.weight:
+			if self.frame - self.timeStamps["hit"] > self.equipment["weapon"].weight:
 				success = False
-				if dist < self.weapon.reach:
+				if dist < self.equipment["weapon"].reach:
 					success = self.hit(angle, dist)
 				if not success:
 					self.state = "IDLE"
 
-		if dist < self.weapon.reach:
+		if dist < self.equipment["weapon"].reach:
 			self.state = "INFIGHT"

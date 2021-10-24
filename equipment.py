@@ -53,3 +53,18 @@ class Shield:
 		self.damageMultiplier = 0.8
 		self.condition = 100
 		self.weaknesses = [] # [{"type": "blunt", "multiplier": 0.5}, {...}]
+
+
+class Shirt:
+	def __init__(self, color=(255,0,255)):
+		print("pants init")
+
+
+class Pants:
+	def __init__(self, color=(255,0,255)):
+		print("pants init")
+
+
+class Hair:
+	def __init__(self, color=(255,0,255)):
+		print("pants init")
