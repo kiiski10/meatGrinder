@@ -61,7 +61,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.rect.center = team["fighterInputs"][spawnNr],
 		self.rect.x += random.randint(-20, 20)
 		self.rect.y = random.randint(0, 450)
-		self.enemyDetectionAreaSize = 450
+		self.enemyDetectionAreaSize = 100
 		self.dir = 45
 		self.speed = speed
 		self.state = "IDLE" # IDLE, SEARCH, MOVE, INFIGHT, STUNNED, DEAD
@@ -90,10 +90,18 @@ class Fighter(pygame.sprite.Sprite):
 		pa.replace(colorToReplace, self.team["color"])
 
 
+	def centerPoint(self):
+		return [
+			self.rect.center[0] + self.rect.width / 2,
+			self.rect.center[1] + self.rect.height / 2
+		]
+
 	def getDetectionRect(self):
 		w = self.enemyDetectionAreaSize
 		h = self.enemyDetectionAreaSize
-		r = pygame.Rect(self.rect.center, [w, h])
+		r = pygame.Rect((0, 0), [w, h])
+		self.centerPoint()
+		r.center = self.centerPoint()
 		return(r)
 
 
@@ -137,22 +145,19 @@ class Fighter(pygame.sprite.Sprite):
 
 		# 1. define hit area
 		reach = self.equipment["weapon"].reach
-		offset = self.rect.width
-		hitArea = pygame.Rect((0,0), (reach,reach))
-		hitArea.center = utilities.angleDistToPos(
-			(
-				self.rect.x + offset,
-				self.rect.y + offset
-			),
+		self.lastHitArea = pygame.Rect((0,0), (reach,reach))
+		center = self.centerPoint()
+
+		self.lastHitArea.center = utilities.angleDistToPos(
+			center,
 			angle,
-			self.equipment["weapon"].reach
+			reach
 		)
-		self.lastHitArea = hitArea
 
 		# 2. find players in the area
 		enemiesInArea = []
 		for p in list(filter(lambda x: x.team != self.team, self.world.fighters)):
-			if hitArea.colliderect(p.rect):
+			if self.lastHitArea.colliderect(p.rect):
 				enemiesInArea.append(p)
 
 		# 3. deal damage to players
@@ -177,6 +182,12 @@ class Fighter(pygame.sprite.Sprite):
 				(self.rect.center[0] + 24, self.rect.center[1] + 24),
 				(self.target.center[0] + 24, self.target.center[1] + 24),
 				1
+		)
+		pygame.draw.rect(
+			self.world.debugLayer,
+			(200, 30, 30),
+			self.getDetectionRect(),
+			1
 		)
 
 		debug = True

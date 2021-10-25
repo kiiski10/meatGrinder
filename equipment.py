@@ -3,7 +3,7 @@ class Sword:
 		print("sword init")
 		self.category = "weapon"
 		self.type = "slash"
-		self.reach = 35
+		self.reach = 135
 		self.baseDamage = 10
 		self.level = level
 		self.weight = 15
