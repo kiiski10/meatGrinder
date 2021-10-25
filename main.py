@@ -1,10 +1,12 @@
-import os, time, random, pygame
-from pytmx import load_pygame
+import time, random, pygame
+
+WINDOW_SIZE = [900, 500]
+displaySurf = pygame.display.set_mode(WINDOW_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)# | pygame.FULLSCREEN)
+pygame.display.init()
+from equipment import *
 from grinder import Grinder
 from character import Fighter
 
-APP_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
-WINDOW_SIZE = [900, 500]
 
 fighterInputs =	{
 	"A": [800, 200],
@@ -24,9 +26,6 @@ teams = {
 	}
 }
 
-displaySurf = pygame.display.set_mode(WINDOW_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)# | pygame.FULLSCREEN)
-pygame.display.init()
-fighterTiles = load_pygame(os.path.join(APP_PATH, "tiles", "fighter.tmx"))
 meatGrinder = Grinder(teams, fighterInputs, displaySurf)
 
 def addFighter(team, spawn, speed, equipment):
@@ -35,8 +34,8 @@ def addFighter(team, spawn, speed, equipment):
 		team=teams[team],
 		spawnNr=spawn,
 		speed=speed,
-		fighterTiles=fighterTiles,
-		selectedEquipment=equipment)
+		selectedEquipment=equipment
+	)
 )
 
 def handleEvents():
@@ -52,7 +51,7 @@ def handleEvents():
 	return(True)
 
 def	randomEquipments(n):
-	equipmentAvailable = ["sword", "shield", "shirt", "pants", "hair"]
+	equipmentAvailable = [Sword(), Shield(), Shirt(), Pants(), Hair()]
 	selectedEquipment = []
 	while len(selectedEquipment) < n:
 		e = random.choice(equipmentAvailable)

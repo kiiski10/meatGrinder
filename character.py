@@ -5,55 +5,14 @@ from equipment import *
 pygame.font.init()
 font = pygame.font.SysFont('Monotype', 12)
 
-SPRITE_ROW_MAPPING = {
-	"body": 0,
-	"sword": 1,
-	"shield": 2,
-	"shirt": 3,
-	"pants": 4,
-	"hair": 5,
-}
-
-equipmentAvailable = {
-	"fist": Fist(),
-	"sword": Sword(),
-	"skin": Skin(),
-	"shield": Shield(),
-	"hair": Hair(),
-	"pants": Pants(),
-	"shirt": Shirt(),
-}
-
 class Fighter(pygame.sprite.Sprite):
 	def __init__(
 			self, speed=1, world=None, selectedEquipment=[],
-			primaryTarget=None, team=None,
-			fighterTiles=None, spawnNr=0
+			primaryTarget=None, team=None, spawnNr=0
 		):
 
 		print("fighter init")
 
-		images = {}
-		for e in selectedEquipment:
-			images[e] = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[e], 0)
-
-			self.equipment = {
-				"weapon": Fist(),
-				"armor": Skin(),
-			}
-
-			if e == "shield":
-				self.armor = equipmentAvailable["shield"]
-			elif e == "sword":
-				self.weapon = equipmentAvailable["sword"]
-
-		if not "weapon" in self.equipment:
-			self.equipment["weapon"] = equipmentAvailable["fist"]
-
-		if not "armor" in self.equipment:
-			self.equipment["armor"]  = equipmentAvailable["skin"]
-
-		self.images = images
 		pygame.sprite.Sprite.__init__(self)
 		self.image = fighterTiles.get_tile_image(0, 0, 0).copy() # set naked body sprite as base image
 		self.world = world
@@ -61,7 +20,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.rect.center = team["fighterInputs"][spawnNr],
 		self.rect.x += random.randint(-20, 20)
 		self.rect.y = random.randint(0, 450)
-		self.enemyDetectionAreaSize = 100
+		self.enemyDetectionAreaSize = 350
 		self.dir = 45
 		self.speed = speed
 		self.state = "IDLE" # IDLE, SEARCH, MOVE, INFIGHT, STUNNED, DEAD
@@ -73,10 +32,6 @@ class Fighter(pygame.sprite.Sprite):
 		self.anim = [self.image]
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
 
-		for e in images:
-			if images[e]:
-				self.image.blit(images[e], [0, 0])
-
 		self.timeStamps = {
 			"spawn": 0,
 			"hit": 0,
@@ -84,6 +39,15 @@ class Fighter(pygame.sprite.Sprite):
 			"move": 0,
 			"search": 0,
 		}
+
+		self.equipment = {
+			"weapon": Fist(),
+			"armor": Skin(),
+		}
+
+		for e in selectedEquipment:
+			print("EQUIP:", e.name)
+			self.image.blit(e.image, [0, 0])
 
 		colorToReplace = (255,0,0)
 		pa = pygame.PixelArray(self.image)
@@ -145,6 +109,7 @@ class Fighter(pygame.sprite.Sprite):
 
 		# 1. define hit area
 		reach = self.equipment["weapon"].reach
+		#print("HIT:", self.equipment["weapon"])
 		self.lastHitArea = pygame.Rect((0,0), (reach,reach))
 		center = self.centerPoint()
 
@@ -183,12 +148,12 @@ class Fighter(pygame.sprite.Sprite):
 				(self.target.center[0] + 24, self.target.center[1] + 24),
 				1
 		)
-		pygame.draw.rect(
-			self.world.debugLayer,
-			(200, 30, 30),
-			self.getDetectionRect(),
-			1
-		)
+		# pygame.draw.rect(
+		# 	self.world.debugLayer,
+		# 	(200, 30, 30),
+		# 	self.getDetectionRect(),
+		# 	1
+		# )
 
 		debug = True
 		if debug: # hit marker
