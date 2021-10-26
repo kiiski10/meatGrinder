@@ -19,7 +19,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.rect.y = random.randint(0, 450)
 		self.enemyDetectionAreaSize = 350
 		self.dir = 45
-		self.speed = speed
+		self.speed = speed + random.randint(10, 30) / 10
 		self.state = "IDLE" # IDLE, SEARCH, MOVE, INFIGHT, STUNNED, DEAD
 		self.searchInterval = random.randint(10, 15)
 		self.team = team
@@ -197,9 +197,10 @@ class Fighter(pygame.sprite.Sprite):
 		if self.state == "SEARCH":
 			self.target = self.findTarget()
 			self.dir = utilities.angleTo(self.rect.center, self.target.center)
+			self.state = "MOVE"
 
 		if not self.target:
-			self.target = pygame.Rect(self.team["primaryTarget"], (0,0))
+			self.target = pygame.Rect(self.team["primaryTarget"], (3,3))
 
 		dist = utilities.distTo(self.rect.center, self.target.center)
 		angle = utilities.angleTo(self.rect.center, self.target.center)
@@ -218,7 +219,9 @@ class Fighter(pygame.sprite.Sprite):
 				if not success:
 					self.state = "MOVE"
 					self.timeStamps["move"] = self.frame
-					self.dir = angle
+					self.dir = angle - 180
+					if angle < 0:
+						angle += 360
 
 		elif self.state == "DEAD":
 			pass # Cant do much else while dead
@@ -226,7 +229,3 @@ class Fighter(pygame.sprite.Sprite):
 		if dist < self.equipment["weapon"].reach:
 			self.state = "INFIGHT"
 			self.timeStamps["infight"] = self.frame
-
-		elif self.frame - self.timeStamps["move"] > 10:
-			self.state = "MOVE"
-			self.timeStamps["move"] = self.frame
