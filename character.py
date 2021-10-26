@@ -31,6 +31,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.animFrame = 0
 		self.anim = [self.image]
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
+		self.bloodDrops = []
 
 		self.timeStamps = {
 			"spawn": 0,
@@ -63,8 +64,8 @@ class Fighter(pygame.sprite.Sprite):
 
 	def centerPoint(self):
 		return [
-			self.rect.center[0] + self.rect.width / 2,
-			self.rect.center[1] + self.rect.height / 2
+			int(self.rect.center[0] + self.rect.width / 2),
+			int(self.rect.center[1] + self.rect.height / 2)
 		]
 
 	def getDetectionRect(self):
@@ -102,10 +103,20 @@ class Fighter(pygame.sprite.Sprite):
 		self.image = self.anim[self.animFrame]
 		self.rect.center = utilities.angleDistToPos(self.rect.center, angle, 1.1 * self.speed)
 
+	def addBloodDrop(self):
+		self.bloodDrops.append(
+			{
+				"spawnOnFrame": self.frame,
+				"speed": 5,
+				"pos": self.centerPoint()
+			}
+		)
+
 
 	def takeHit(self, hit):
 		damage = (hit["baseDamage"] * hit["level"]) * self.equipment["armor"].damageMultiplier
 		self.health -= damage
+		self.addBloodDrop()
 		if self.health <= 0:
 			self.world.dead.append(self)
 			self.world.fighters.remove(self)
@@ -155,12 +166,18 @@ class Fighter(pygame.sprite.Sprite):
 				(self.target.center[0] + 24, self.target.center[1] + 24),
 				1
 		)
-		# pygame.draw.rect(
-		# 	self.world.debugLayer,
-		# 	(200, 30, 30),
-		# 	self.getDetectionRect(),
-		# 	1
-		# )
+
+		for b in self.bloodDrops:
+			bloodSize = 10
+			drop = pygame.Rect((0,0), (bloodSize, bloodSize))
+			drop.center = b["pos"]
+			pygame.draw.rect(
+				self.world.bloodNcorpseLayer,
+				(200,0,0),
+				drop,
+				0
+			)
+			#self.world.bloodNcorpseLayer.set_at(b["pos"], (240, 30, 30))
 
 		debug = True
 		if debug: # hit marker
