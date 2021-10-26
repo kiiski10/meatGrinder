@@ -46,8 +46,15 @@ class Fighter(pygame.sprite.Sprite):
 		}
 
 		for e in selectedEquipment:
-			print("EQUIP:", e.name)
+			print("EQUIP:", e.category, e.name)
+			if e.category == "armor":
+				self.equipment["armor"] = e
+
+			elif e.category == "weapon":
+				self.equipment["weapon"] = e
+
 			self.image.blit(e.image, [0, 0])
+
 
 		colorToReplace = (255,0,0)
 		pa = pygame.PixelArray(self.image)
@@ -93,7 +100,7 @@ class Fighter(pygame.sprite.Sprite):
 		if self.animFrame >= len(self.anim):
 			self.animFrame = 0
 		self.image = self.anim[self.animFrame]
-		self.rect.center = utilities.angleDistToPos(self.rect.center, angle, self.speed)
+		self.rect.center = utilities.angleDistToPos(self.rect.center, angle, 1.1 * self.speed)
 
 
 	def takeHit(self, hit):
@@ -109,7 +116,7 @@ class Fighter(pygame.sprite.Sprite):
 
 		# 1. define hit area
 		reach = self.equipment["weapon"].reach
-		#print("HIT:", self.equipment["weapon"])
+		print("HIT:", self.equipment["weapon"])
 		self.lastHitArea = pygame.Rect((0,0), (reach,reach))
 		center = self.centerPoint()
 

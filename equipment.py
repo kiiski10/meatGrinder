@@ -21,8 +21,8 @@ class Sword:
 		self.name = "sword"
 		self.category = "weapon"
 		self.type = "slash"
-		self.reach = 65
-		self.baseDamage = 10
+		self.reach = 50
+		self.baseDamage = 30
 		self.level = level
 		self.weight = 15
 		self.condition = 100
