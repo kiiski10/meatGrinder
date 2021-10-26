@@ -31,7 +31,6 @@ class Fighter(pygame.sprite.Sprite):
 		self.animFrame = 0
 		self.anim = [self.image]
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
-		self.bloodDrops = []
 
 		self.timeStamps = {
 			"spawn": 0,
@@ -104,9 +103,10 @@ class Fighter(pygame.sprite.Sprite):
 		self.rect.center = utilities.angleDistToPos(self.rect.center, angle, 1.1 * self.speed)
 
 	def addBloodDrop(self):
-		self.bloodDrops.append(
+		self.world.bloodDrops.append(
 			{
 				"spawnOnFrame": self.frame,
+				"dir": 90,
 				"speed": 5,
 				"pos": self.centerPoint()
 			}
@@ -167,35 +167,6 @@ class Fighter(pygame.sprite.Sprite):
 				(self.target.center[0] + 24, self.target.center[1] + 24),
 				1
 		)
-
-		for b in self.bloodDrops:
-			bloodSize = 10
-			drop = pygame.Rect((0,0), (bloodSize, bloodSize))
-			lifeTime = self.frame - b["spawnOnFrame"]
-			x = b["pos"][0]
-			y = b["pos"][1]
-
-			drop.center = [
-				x + lifeTime,
-				y + lifeTime
-			]
-
-			print(lifeTime)
-			if lifeTime > 100:
-				targetLayer = self.world.bloodNcorpseLayer
-				color = (100,50,0)
-				self.bloodDrops.remove(b)
-			else:
-				targetLayer = self.world.bloodDropLayer
-				color = (200,100,0)
-
-			pygame.draw.rect(
-				targetLayer,
-				color,
-				drop,
-				0
-			)
-
 
 		debug = True
 		if debug: # hit marker

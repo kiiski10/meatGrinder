@@ -14,6 +14,8 @@ class Grinder:
 		self.fighters = []
 		self.dead = []
 		self.teams = teams
+		self.bloodDrops = []
+
 		self.stats = {
 			"step": 0
 		}
@@ -24,8 +26,37 @@ class Grinder:
 		for f in self.fighters:
 			f.step(self.stats["step"])
 
+	def renderBlood(self):
+		for b in self.bloodDrops:
+			bloodSize = 10
+			drop = pygame.Rect((0,0), (bloodSize, bloodSize))
+			lifeTime = self.stats["step"] - b["spawnOnFrame"]
+			x = b["pos"][0]
+			y = b["pos"][1]
+
+			drop.center = [
+				x + lifeTime,
+				y + lifeTime
+			]
+
+			if lifeTime > 100:
+				targetLayer = self.bloodNcorpseLayer
+				color = (100,50,0)
+				self.bloodDrops.remove(b)
+			else:
+				targetLayer = self.bloodDropLayer
+				color = (200,100,0)
+
+			pygame.draw.rect(
+				targetLayer,
+				color,
+				drop,
+				0
+			)
+
 	def render(self, displaySurf):
 		# render gore
+		self.renderBlood()
 		pygame.Surface.blit(
 			displaySurf,
 			self.bloodNcorpseLayer,
