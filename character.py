@@ -102,21 +102,22 @@ class Fighter(pygame.sprite.Sprite):
 		self.image = self.anim[self.animFrame]
 		self.rect.center = utilities.angleDistToPos(self.rect.center, angle, 1.1 * self.speed)
 
-	def addBloodDrop(self):
+	def addBloodDrop(self, dir, damage):
 		self.world.bloodDrops.append(
 			{
-				"spawnOnFrame": self.frame,
-				"dir": 90,
-				"speed": 5,
+				"spiltOnFrame": self.frame,
+				"damage": damage,
+				"dir": dir,
+				"speed": 10,
 				"pos": self.centerPoint()
 			}
 		)
 
 
-	def takeHit(self, hit):
+	def takeHit(self, hit, angle):
 		damage = (hit["baseDamage"] * hit["level"]) * self.equipment["armor"].damageMultiplier
 		self.health -= damage
-		self.addBloodDrop()
+		self.addBloodDrop(angle, damage)
 		if self.health <= 0:
 			self.world.dead.append(self)
 			self.world.fighters.remove(self)
@@ -146,7 +147,7 @@ class Fighter(pygame.sprite.Sprite):
 
 		# 3. deal damage to players
 		for e in enemiesInArea:
-			e.takeHit(self.equipment["weapon"].hit)
+			e.takeHit(self.equipment["weapon"].hit, angle)
 
 		if len(enemiesInArea) > 0:
 			return(True)

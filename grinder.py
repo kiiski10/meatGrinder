@@ -1,4 +1,5 @@
-import pygame
+import pygame, random
+import utilities
 
 class Grinder:
 	def __init__(self, teams, inputs, displaySurf):
@@ -28,24 +29,23 @@ class Grinder:
 
 	def renderBlood(self):
 		for b in self.bloodDrops:
-			bloodSize = 10
-			drop = pygame.Rect((0,0), (bloodSize, bloodSize))
-			lifeTime = self.stats["step"] - b["spawnOnFrame"]
+			lifeTime = self.stats["step"] - b["spiltOnFrame"]
 			x = b["pos"][0]
 			y = b["pos"][1]
+			x, y = utilities.angleDistToPos(b["pos"], b["dir"], lifeTime * b["speed"])
 
-			drop.center = [
-				x + lifeTime,
-				y + lifeTime
-			]
-
-			if lifeTime > 100:
+			if lifeTime > 10 + random.randint(-5, 5):
+				bloodSize = 5
 				targetLayer = self.bloodNcorpseLayer
-				color = (100,50,0)
+				color = (250,50,35)
 				self.bloodDrops.remove(b)
 			else:
+				bloodSize = 3
 				targetLayer = self.bloodDropLayer
-				color = (200,100,0)
+				color = (250,100,70)
+
+			drop = pygame.Rect((0,0), (bloodSize, bloodSize))
+			drop.center = [x, y]
 
 			pygame.draw.rect(
 				targetLayer,
