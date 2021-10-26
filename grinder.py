@@ -16,13 +16,27 @@ class Grinder:
 		self.dead = []
 		self.teams = teams
 		self.bloodDrops = []
-
+		self.debug = False
+		self.teamsFilteredOn = 0
+		self.enemiesOf = {}
+		for t in self.teams:
+			self.enemiesOf[t] = []
 		self.stats = {
 			"step": 0
 		}
 
 	def step(self):
 		self.stats["step"] += 1
+
+		if self.stats["step"] - self.teamsFilteredOn > 60:
+			self.teamsFilteredOn = self.stats["step"]
+
+			for t in self.teams:
+				self.enemiesOf[t] = []
+
+			for t in self.teams:
+				self.enemiesOf[t] = self.listEnemies(t)
+				print("enemies of", t, len(self.enemiesOf[t]))
 
 		for f in self.fighters:
 			f.step(self.stats["step"])
@@ -67,6 +81,9 @@ class Grinder:
 				0
 			)
 
+	def listEnemies(self, team):
+		return(list(filter(lambda x: x.team["name"] != team, self.fighters)))
+
 	def render(self, displaySurf):
 		# render gore
 		self.drawBlood()
@@ -91,8 +108,10 @@ class Grinder:
 			)
 
 		# render debug layer
-		pygame.Surface.blit(
-			displaySurf,
-			self.debugLayer,
-			[0, 0]
-		)
+		if self.debug:
+			self.debugLayer.fill((0,0,0))
+			pygame.Surface.blit(
+				displaySurf,
+				self.debugLayer,
+				[0, 0]
+			)

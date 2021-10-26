@@ -9,7 +9,7 @@ from grinder import Grinder
 from character import Fighter
 
 
-START_PLAYER_COUNT = 1000
+START_PLAYER_COUNT = 2000
 
 fighterInputs =	{
 	"A": [800, 200],
@@ -18,11 +18,13 @@ fighterInputs =	{
 
 teams = {
 	"red": {
+		"name": "red",
 		"color": (170, 40, 40),
 		"fighterInputs": [fighterInputs["A"]],
 		"primaryTarget": fighterInputs["B"]
 	},
 	"blue": {
+		"name": "blue",
 		"color": (40, 40, 170),
 		"fighterInputs": [fighterInputs["B"]],
 		"primaryTarget": fighterInputs["A"]
@@ -91,7 +93,6 @@ while running:
 
 	stepPerSecCounter += 1
 	running = handleEvents()
-	meatGrinder.debugLayer.fill((255, 0, 255))
 	displaySurf.fill((200, 200, 200))
 	meatGrinder.step()
 	meatGrinder.render(displaySurf)

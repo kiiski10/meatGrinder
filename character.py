@@ -76,7 +76,8 @@ class Fighter(pygame.sprite.Sprite):
 
 	def findTarget(self):
 		self.timeStamps["search"] = self.frame
-		enemies = list(filter(lambda x: x.team != self.team, self.world.fighters))
+		#enemies = list(filter(lambda x: x.team != self.team, self.world.fighters))
+		enemies = self.world.enemiesOf[self.team["name"]]
 		enemyRects = []
 		for e in enemies:
 			enemyRects.append(e.rect)
@@ -126,7 +127,8 @@ class Fighter(pygame.sprite.Sprite):
 
 		# 2. find players in the area
 		enemiesInArea = []
-		for p in list(filter(lambda x: x.team != self.team, self.world.fighters)):
+
+		for p in self.world.listEnemies(self.team):
 			if self.lastHitArea.colliderect(p.rect):
 				enemiesInArea.append(p)
 
