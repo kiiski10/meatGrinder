@@ -91,16 +91,10 @@ while running:
 	meatGrinder.debugLayer.fill((255, 0, 255))
 	displaySurf.fill((200, 200, 200))
 	meatGrinder.step()
-	if not random.getrandbits(5):
-		speed = random.randint(20, 60) / 10
-		team = random.choice(list(teams))
-		addFighter(team, 0, speed, randomEquipments(3))
-		plrCount += 1
-
 	meatGrinder.render(displaySurf)
 	pygame.display.flip()
 	pygame.display.set_caption("MeatGrinder | Fighters: {} | {}".format(plrCount - len(meatGrinder.dead), captionExtraText))
-	time.sleep(0.0025)
+	#time.sleep(0.00001)
 
 
 pygame.quit()

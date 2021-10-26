@@ -7,8 +7,7 @@ font = pygame.font.SysFont('Monotype', 12)
 
 class Fighter(pygame.sprite.Sprite):
 	def __init__(
-			self, speed=1, world=None, selectedEquipment=[],
-			primaryTarget=None, team=None, spawnNr=0
+			self, speed=1, world=None, selectedEquipment=[], team=None, spawnNr=0
 		):
 
 		pygame.sprite.Sprite.__init__(self)
@@ -111,18 +110,17 @@ class Fighter(pygame.sprite.Sprite):
 			self.state = "DEAD"
 
 
-	def hit(self, angle, distance):
+	def hit(self, distance):
 		self.timeStamps["hit"] = self.frame
 
 		# 1. define hit area
 		reach = self.equipment["weapon"].reach
 		#print("HIT:", self.equipment["weapon"])
 		self.lastHitArea = pygame.Rect((0,0), (reach,reach))
-		center = self.centerPoint()
 
 		self.lastHitArea.center = utilities.angleDistToPos(
-			center,
-			angle,
+			self.centerPoint(),
+			self.dir,
 			reach
 		)
 
@@ -134,7 +132,7 @@ class Fighter(pygame.sprite.Sprite):
 
 		# 3. deal damage to players
 		for e in enemiesInArea:
-			e.takeHit(self.equipment["weapon"].hit, angle)
+			e.takeHit(self.equipment["weapon"].hit, self.dir)
 
 		if len(enemiesInArea) > 0:
 			return(True)
@@ -145,8 +143,9 @@ class Fighter(pygame.sprite.Sprite):
 
 		if self.frame - self.timeStamps["search"] > self.searchInterval:
 			self.state = "SEARCH"
+			self.timeStamps["search"] = self.frame
 
-		debug = True
+		debug = False
 		if debug and self.target: # target line
 			pygame.draw.line(
 				self.world.debugLayer,
@@ -156,7 +155,7 @@ class Fighter(pygame.sprite.Sprite):
 				1
 		)
 
-		debug = True
+		debug = False
 		if debug: # hit marker
 			if self.lastHitArea:
 				pygame.draw.rect(
@@ -187,27 +186,33 @@ class Fighter(pygame.sprite.Sprite):
 			self.world.debugLayer.blit(textsurface,(x,y))
 
 
-		if self.state == "IDLE":
-			self.state = "SEARCH"
-			self.timeStamps["search"] = self.frame
-
 		if self.state == "SEARCH":
 			self.target = self.findTarget()
+
+		if not self.target:
+			self.target = pygame.Rect(self.team["primaryTarget"], (0,0))
 
 		dist = utilities.distTo(self.rect.center, self.target.center)
 		angle = utilities.angleTo(self.rect.center, self.target.center)
 
-		if self.state == "MOVE":
+		if self.state == "IDLE":
+			self.state = "SEARCH"
+			self.timeStamps["search"] = self.frame
+
+		elif self.state == "MOVE":
 			self.move(angle)
 
-		if self.state == "INFIGHT":
+		elif self.state == "INFIGHT":
 			if self.frame - self.timeStamps["hit"] > self.equipment["weapon"].weight:
 				success = False
 				if dist < self.equipment["weapon"].reach:
-					success = self.hit(angle, dist)
+					success = self.hit(angle)
 				if not success:
 					self.state = "MOVE"
 					self.timeStamps["move"] = self.frame
+
+		elif self.state == "DEAD":
+			pass # Cant do much else while dead
 
 		if dist < self.equipment["weapon"].reach:
 			self.state = "INFIGHT"
@@ -216,6 +221,3 @@ class Fighter(pygame.sprite.Sprite):
 		elif self.frame - self.timeStamps["move"] > 10:
 			self.state = "MOVE"
 			self.timeStamps["move"] = self.frame
-
-		elif self.state == "DEAD":
-			pass # Cant do much else while dead

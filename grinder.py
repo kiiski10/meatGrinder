@@ -82,12 +82,6 @@ class Grinder:
 		)
 		self.bloodDropLayer.fill((0,0,0))
 
-		# render debug layer
-		pygame.Surface.blit(
-			displaySurf,
-			self.debugLayer,
-			[0, 0]
-		)
 		# renderFighters
 		for f in self.fighters:
 			pygame.Surface.blit(
@@ -95,3 +89,10 @@ class Grinder:
 				f.image,
 				f.rect.center
 			)
+
+		# render debug layer
+		pygame.Surface.blit(
+			displaySurf,
+			self.debugLayer,
+			[0, 0]
+		)
