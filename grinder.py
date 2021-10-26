@@ -34,21 +34,21 @@ class Grinder:
 				"spiltOnFrame": self.stats["step"],
 				"damage": damage,
 				"dir": dir,
-				"speed": 10,
+				"speed": 7,
 				"pos": pos
 			}
 		)
 
 
-	def renderBlood(self):
+	def drawBlood(self):
 		for b in self.bloodDrops:
 			lifeTime = self.stats["step"] - b["spiltOnFrame"]
 			x = b["pos"][0]
 			y = b["pos"][1]
 			x, y = utilities.angleDistToPos(b["pos"], b["dir"], lifeTime * b["speed"])
 
-			if lifeTime > 10 + random.randint(-5, 5):
-				bloodSize = 5
+			if lifeTime > b["damage"] * 0.5:
+				bloodSize = 7
 				targetLayer = self.bloodNcorpseLayer
 				color = (250,50,35)
 				self.bloodDrops.remove(b)
@@ -69,7 +69,7 @@ class Grinder:
 
 	def render(self, displaySurf):
 		# render gore
-		self.renderBlood()
+		self.drawBlood()
 		pygame.Surface.blit(
 			displaySurf,
 			self.bloodNcorpseLayer,

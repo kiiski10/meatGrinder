@@ -7,7 +7,7 @@ from equipment import *
 from grinder import Grinder
 from character import Fighter
 
-START_PLAYER_COUNT = 10
+START_PLAYER_COUNT = 1000
 
 fighterInputs =	{
 	"A": [800, 200],
@@ -76,8 +76,17 @@ for i in range(plrCount):
 	speed = random.randint(20, 60) / 10
 	addFighter(team, 0, speed, randomEquipments(3))
 
+stepPerSecCounter = 0
+stepPerSecTimer = time.time()
+captionExtraText = ""
 
 while running:
+	stepPerSecCounter += 1
+	if time.time() - stepPerSecTimer > 1:
+		captionExtraText = "FPS:{} PLRS:{} BLD:{}".format(stepPerSecCounter, plrCount - len(meatGrinder.dead), len(meatGrinder.bloodDrops))
+		stepPerSecTimer = time.time()
+		stepPerSecCounter = 0
+
 	running = handleEvents()
 	meatGrinder.debugLayer.fill((255, 0, 255))
 	displaySurf.fill((200, 200, 200))
@@ -90,8 +99,9 @@ while running:
 
 	meatGrinder.render(displaySurf)
 	pygame.display.flip()
-	pygame.display.set_caption("MeatGrinder | Fighters: {}".format(plrCount - len(meatGrinder.dead)))
-	time.sleep(0.025)
+	pygame.display.set_caption("MeatGrinder | Fighters: {} | {}".format(plrCount - len(meatGrinder.dead), captionExtraText))
+	time.sleep(0.0025)
+
 
 pygame.quit()
 print("QUIT BYE")

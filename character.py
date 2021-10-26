@@ -11,8 +11,6 @@ class Fighter(pygame.sprite.Sprite):
 			primaryTarget=None, team=None, spawnNr=0
 		):
 
-		print("fighter init")
-
 		pygame.sprite.Sprite.__init__(self)
 		self.image = fighterTiles.get_tile_image(0, 0, 0).copy() # set naked body sprite as base image
 		self.world = world
@@ -24,6 +22,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.dir = 45
 		self.speed = speed
 		self.state = "IDLE" # IDLE, SEARCH, MOVE, INFIGHT, STUNNED, DEAD
+		self.searchInterval = random.randint(20, 100)
 		self.team = team
 		self.health = 100
 		self.target = None
@@ -46,7 +45,7 @@ class Fighter(pygame.sprite.Sprite):
 		}
 
 		for e in selectedEquipment:
-			print("EQUIP:", e.category, e.name)
+			#print("EQUIP:", e.category, e.name)
 			if e.category == "armor":
 				self.equipment["armor"] = e
 
@@ -144,7 +143,7 @@ class Fighter(pygame.sprite.Sprite):
 	def step(self, frame):
 		self.frame = frame
 
-		if self.frame - self.timeStamps["search"] > 15 * (random.randint(1, 10)):
+		if self.frame - self.timeStamps["search"] > self.searchInterval:
 			self.state = "SEARCH"
 
 		debug = True
