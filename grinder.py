@@ -8,6 +8,8 @@ class Grinder:
 		self.debugLayer.set_colorkey((255, 0, 255))
 		self.bloodNcorpseLayer = pygame.Surface(displaySurf.get_rect().size)
 		self.bloodNcorpseLayer.set_colorkey((0, 0, 0))
+		self.bloodDropLayer = pygame.Surface(displaySurf.get_rect().size)
+		self.bloodDropLayer.set_colorkey((0, 0, 0))
 		self.inputs = inputs # [{"name": "A", "pos": [x, y], "que": []}]
 		self.fighters = []
 		self.dead = []
@@ -29,6 +31,13 @@ class Grinder:
 			self.bloodNcorpseLayer,
 			[0, 0]
 		)
+		pygame.Surface.blit(
+			displaySurf,
+			self.bloodDropLayer,
+			[0, 0]
+		)
+		self.bloodDropLayer.fill((0,0,0))
+
 		# render debug layer
 		pygame.Surface.blit(
 			displaySurf,

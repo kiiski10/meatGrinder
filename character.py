@@ -120,6 +120,7 @@ class Fighter(pygame.sprite.Sprite):
 		if self.health <= 0:
 			self.world.dead.append(self)
 			self.world.fighters.remove(self)
+			self.state = "DEAD"
 
 
 	def hit(self, angle, distance):
@@ -170,14 +171,31 @@ class Fighter(pygame.sprite.Sprite):
 		for b in self.bloodDrops:
 			bloodSize = 10
 			drop = pygame.Rect((0,0), (bloodSize, bloodSize))
-			drop.center = b["pos"]
+			lifeTime = self.frame - b["spawnOnFrame"]
+			x = b["pos"][0]
+			y = b["pos"][1]
+
+			drop.center = [
+				x + lifeTime,
+				y + lifeTime
+			]
+
+			print(lifeTime)
+			if lifeTime > 100:
+				targetLayer = self.world.bloodNcorpseLayer
+				color = (100,50,0)
+				self.bloodDrops.remove(b)
+			else:
+				targetLayer = self.world.bloodDropLayer
+				color = (200,100,0)
+
 			pygame.draw.rect(
-				self.world.bloodNcorpseLayer,
-				(200,0,0),
+				targetLayer,
+				color,
 				drop,
 				0
 			)
-			#self.world.bloodNcorpseLayer.set_at(b["pos"], (240, 30, 30))
+
 
 		debug = True
 		if debug: # hit marker
@@ -239,3 +257,6 @@ class Fighter(pygame.sprite.Sprite):
 		elif self.frame - self.timeStamps["move"] > 10:
 			self.state = "MOVE"
 			self.timeStamps["move"] = self.frame
+
+		elif self.state == "DEAD":
+			pass # Cant do much else while dead
