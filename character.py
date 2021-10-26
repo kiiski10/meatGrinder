@@ -215,7 +215,7 @@ class Fighter(pygame.sprite.Sprite):
 					self.state = "MOVE"
 					self.timeStamps["move"] = self.frame
 
-		if dist < self.equipment["weapon"].reach and dist > self.rect.width / 2:
+		if dist < self.equipment["weapon"].reach:
 			self.state = "INFIGHT"
 			self.timeStamps["infight"] = self.frame
 

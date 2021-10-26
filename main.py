@@ -82,7 +82,7 @@ while running:
 	meatGrinder.debugLayer.fill((255, 0, 255))
 	displaySurf.fill((200, 200, 200))
 	meatGrinder.step()
-	if not random.getrandbits(50):
+	if not random.getrandbits(5):
 		speed = random.randint(20, 60) / 10
 		team = random.choice(list(teams))
 		addFighter(team, 0, speed, randomEquipments(3))
