@@ -17,6 +17,7 @@ class Grinder:
 		self.teams = teams
 		self.bloodDrops = []
 		self.debug = False
+		#self.debug = True
 		self.teamsFilteredOn = 0
 		self.enemiesOf = {}
 		for t in self.teams:
@@ -28,7 +29,7 @@ class Grinder:
 	def step(self):
 		self.stats["step"] += 1
 
-		if self.stats["step"] - self.teamsFilteredOn > 60:
+		if self.stats["step"] - self.teamsFilteredOn > 10:
 			self.teamsFilteredOn = self.stats["step"]
 
 			for t in self.teams:
@@ -36,25 +37,27 @@ class Grinder:
 
 			for t in self.teams:
 				self.enemiesOf[t] = self.listEnemies(t)
-				print("enemies of", t, len(self.enemiesOf[t]))
 
 		for f in self.fighters:
 			f.step(self.stats["step"])
 
 
-	def addBloodDrop(self, pos, dir, damage):
+	def addBloodDrop(self, pos, dir, damage, color):
 		self.bloodDrops.append(
 			{
 				"spiltOnFrame": self.stats["step"],
 				"damage": damage,
 				"dir": dir,
 				"speed": 7,
-				"pos": pos
+				"pos": pos,
+				"color": color
 			}
 		)
 
 
 	def drawBlood(self):
+		self.bloodDropLayer.fill((0,0,0))
+
 		for b in self.bloodDrops:
 			lifeTime = self.stats["step"] - b["spiltOnFrame"]
 			x = b["pos"][0]
@@ -62,14 +65,14 @@ class Grinder:
 			x, y = utilities.angleDistToPos(b["pos"], b["dir"], lifeTime * b["speed"])
 
 			if lifeTime > b["damage"] * 0.5:
-				bloodSize = 7
+				bloodSize = 5
 				targetLayer = self.bloodNcorpseLayer
-				color = (250,50,35)
+				color = b["color"]
 				self.bloodDrops.remove(b)
 			else:
 				bloodSize = 3
 				targetLayer = self.bloodDropLayer
-				color = (250,100,70)
+				color = b["color"]
 
 			drop = pygame.Rect((0,0), (bloodSize, bloodSize))
 			drop.center = [x, y]
@@ -81,23 +84,22 @@ class Grinder:
 				0
 			)
 
-	def listEnemies(self, team):
-		return(list(filter(lambda x: x.team["name"] != team, self.fighters)))
-
-	def render(self, displaySurf):
-		# render gore
-		self.drawBlood()
 		pygame.Surface.blit(
-			displaySurf,
+			self.displaySurf,
 			self.bloodNcorpseLayer,
 			[0, 0]
 		)
 		pygame.Surface.blit(
-			displaySurf,
+			self.displaySurf,
 			self.bloodDropLayer,
 			[0, 0]
 		)
-		self.bloodDropLayer.fill((0,0,0))
+
+	def listEnemies(self, team):
+		return(list(filter(lambda x: x.team["name"] != team, self.fighters)))
+
+	def render(self, displaySurf):
+		self.drawBlood()
 
 		# renderFighters
 		for f in self.fighters:
@@ -109,7 +111,6 @@ class Grinder:
 
 		# render debug layer
 		if self.debug:
-			self.debugLayer.fill((0,0,0))
 			pygame.Surface.blit(
 				displaySurf,
 				self.debugLayer,

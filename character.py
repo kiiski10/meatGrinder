@@ -21,7 +21,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.dir = 45
 		self.speed = speed
 		self.state = "IDLE" # IDLE, SEARCH, MOVE, INFIGHT, STUNNED, DEAD
-		self.searchInterval = random.randint(20, 100)
+		self.searchInterval = random.randint(10, 15)
 		self.team = team
 		self.health = 100
 		self.target = None
@@ -76,10 +76,8 @@ class Fighter(pygame.sprite.Sprite):
 
 	def findTarget(self):
 		self.timeStamps["search"] = self.frame
-		#enemies = list(filter(lambda x: x.team != self.team, self.world.fighters))
-		enemies = self.world.enemiesOf[self.team["name"]]
 		enemyRects = []
-		for e in enemies:
+		for e in self.world.enemiesOf[self.team["name"]]:
 			enemyRects.append(e.rect)
 
 		dr = self.getDetectionRect()
@@ -91,20 +89,30 @@ class Fighter(pygame.sprite.Sprite):
 			return(pygame.Rect(self.team["primaryTarget"], (20, 20)))
 
 
-	def move(self, angle):
-		self.dir = angle
-
+	def move(self):
 		# change animation frame
 		self.animFrame += 1
 		if self.animFrame >= len(self.anim):
 			self.animFrame = 0
 		self.image = self.anim[self.animFrame]
-		self.rect.center = utilities.angleDistToPos(self.rect.center, angle, 1.1 * self.speed)
+		self.rect.center = utilities.angleDistToPos(self.rect.center, self.dir, 1.1 * self.speed)
+
 
 	def takeHit(self, hit, angle):
 		damage = (hit["baseDamage"] * hit["level"]) * self.equipment["armor"].damageMultiplier
 		self.health -= damage
-		self.world.addBloodDrop(self.centerPoint(), angle, damage)
+		# print("{} got hit. damage: {}/{}".format(self.team["name"], damage, hit["baseDamage"]))
+		bloodAmount = int(damage / 10)
+		if bloodAmount < 1:
+			bloodAmount = 1
+
+		for d in range(bloodAmount):
+			self.world.addBloodDrop(
+				self.centerPoint(),
+				angle + random.randint(-10,10),
+				damage + random.randint(7,10),
+				(155 + random.randint(0, 100) , 0, 0)
+			)
 		if self.health <= 0:
 			self.world.dead.append(self)
 			self.world.fighters.remove(self)
@@ -115,21 +123,19 @@ class Fighter(pygame.sprite.Sprite):
 		self.timeStamps["hit"] = self.frame
 
 		# 1. define hit area
-		reach = self.equipment["weapon"].reach
-		#print("HIT:", self.equipment["weapon"])
-		self.lastHitArea = pygame.Rect((0,0), (reach,reach))
+		self.lastHitArea = pygame.Rect((100,100), (distance, distance))
 
 		self.lastHitArea.center = utilities.angleDistToPos(
 			self.centerPoint(),
 			self.dir,
-			reach
+			distance
 		)
 
 		# 2. find players in the area
 		enemiesInArea = []
 
-		for p in self.world.listEnemies(self.team):
-			if self.lastHitArea.colliderect(p.rect):
+		for p in self.world.enemiesOf[self.team["name"]]:
+			if self.lastHitArea.colliderect(p.rect) and p.state != "DEAD":
 				enemiesInArea.append(p)
 
 		# 3. deal damage to players
@@ -138,16 +144,16 @@ class Fighter(pygame.sprite.Sprite):
 
 		if len(enemiesInArea) > 0:
 			return(True)
+		else:
+			return(False)
 
 
 	def step(self, frame):
 		self.frame = frame
-
 		if self.frame - self.timeStamps["search"] > self.searchInterval:
 			self.state = "SEARCH"
-			self.timeStamps["search"] = self.frame
 
-		debug = False
+		debug = True
 		if debug and self.target: # target line
 			pygame.draw.line(
 				self.world.debugLayer,
@@ -157,7 +163,7 @@ class Fighter(pygame.sprite.Sprite):
 				1
 		)
 
-		debug = False
+		debug = True
 		if debug: # hit marker
 			if self.lastHitArea:
 				pygame.draw.rect(
@@ -190,6 +196,7 @@ class Fighter(pygame.sprite.Sprite):
 
 		if self.state == "SEARCH":
 			self.target = self.findTarget()
+			self.dir = utilities.angleTo(self.rect.center, self.target.center)
 
 		if not self.target:
 			self.target = pygame.Rect(self.team["primaryTarget"], (0,0))
@@ -199,19 +206,19 @@ class Fighter(pygame.sprite.Sprite):
 
 		if self.state == "IDLE":
 			self.state = "SEARCH"
-			self.timeStamps["search"] = self.frame
 
 		elif self.state == "MOVE":
-			self.move(angle)
+			self.move()
 
 		elif self.state == "INFIGHT":
 			if self.frame - self.timeStamps["hit"] > self.equipment["weapon"].weight:
 				success = False
 				if dist < self.equipment["weapon"].reach:
-					success = self.hit(angle)
+					success = self.hit(dist)
 				if not success:
 					self.state = "MOVE"
 					self.timeStamps["move"] = self.frame
+					self.dir = angle
 
 		elif self.state == "DEAD":
 			pass # Cant do much else while dead

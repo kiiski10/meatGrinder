@@ -42,7 +42,7 @@ class Fist:
 		self.category = "weapon"
 		self.type = "melee"
 		self.reach = 10
-		self.baseDamage = 2
+		self.baseDamage = 5
 		self.level = 1
 		self.weight = 30
 		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)

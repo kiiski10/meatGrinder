@@ -1,10 +1,5 @@
 import pygame, math
 
-def angleDistToPos(pos, angle, dist):
-	x = pos[0] + (math.cos(angle) * dist)
-	y = pos[1] - (math.sin(angle) * dist)
-	return(x, y)
-
 def distTo(fromPos, toPos):
 	dist = math.sqrt((fromPos[0] - toPos[0]) ** 2 + (fromPos[1] - toPos[1]) ** 2)
 	return(dist)

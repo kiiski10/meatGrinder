@@ -8,8 +8,7 @@ from equipment import *
 from grinder import Grinder
 from character import Fighter
 
-
-START_PLAYER_COUNT = 2000
+START_PLAYER_COUNT = 1000
 
 fighterInputs =	{
 	"A": [800, 200],
@@ -87,13 +86,14 @@ winTitleExtraText = ""
 
 while running:
 	if time.time() - stepPerSecTimer >= 1:
-		winTitleExtraText = "FPS:{}/{} PLRS:{} BLOOD:{}".format(stepPerSecCounter, TARGET_FPS, plrCount - len(meatGrinder.dead), len(meatGrinder.bloodDrops))
+		winTitleExtraText = "FPS:{}/{} BLOOD:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops))
 		stepPerSecTimer = time.time()
 		stepPerSecCounter = 0
 
 	stepPerSecCounter += 1
 	running = handleEvents()
 	displaySurf.fill((200, 200, 200))
+	meatGrinder.debugLayer.fill((255,0,255))
 	meatGrinder.step()
 	meatGrinder.render(displaySurf)
 	pygame.display.flip()
