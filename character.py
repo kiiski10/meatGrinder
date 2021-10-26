@@ -116,7 +116,7 @@ class Fighter(pygame.sprite.Sprite):
 
 		# 1. define hit area
 		reach = self.equipment["weapon"].reach
-		print("HIT:", self.equipment["weapon"])
+		#print("HIT:", self.equipment["weapon"])
 		self.lastHitArea = pygame.Rect((0,0), (reach,reach))
 		center = self.centerPoint()
 

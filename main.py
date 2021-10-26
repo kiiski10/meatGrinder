@@ -7,6 +7,7 @@ from equipment import *
 from grinder import Grinder
 from character import Fighter
 
+START_PLAYER_COUNT = 200
 
 fighterInputs =	{
 	"A": [800, 200],
@@ -63,7 +64,7 @@ def	randomEquipments(n):
 pygame.event.get()
 running = True
 
-plrCount = 4
+plrCount = START_PLAYER_COUNT
 c = 0
 for i in range(plrCount):
 	c += 1
