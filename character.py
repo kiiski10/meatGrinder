@@ -195,11 +195,10 @@ class Fighter(pygame.sprite.Sprite):
 
 		if self.state == "IDLE":
 			self.state = "SEARCH"
-
+			self.timeStamps["search"] = self.frame
 
 		if self.state == "SEARCH":
 			self.target = self.findTarget()
-			self.state= "MOVE"
 
 		dist = utilities.distTo(self.rect.center, self.target.center)
 		angle = utilities.angleTo(self.rect.center, self.target.center)
@@ -207,14 +206,19 @@ class Fighter(pygame.sprite.Sprite):
 		if self.state == "MOVE":
 			self.move(angle)
 
-
 		if self.state == "INFIGHT":
 			if self.frame - self.timeStamps["hit"] > self.equipment["weapon"].weight:
 				success = False
 				if dist < self.equipment["weapon"].reach:
 					success = self.hit(angle, dist)
 				if not success:
-					self.state = "IDLE"
+					self.state = "MOVE"
+					self.timeStamps["move"] = self.frame
 
-		if dist < self.equipment["weapon"].reach:
+		if dist < self.equipment["weapon"].reach and dist > self.rect.width / 2:
 			self.state = "INFIGHT"
+			self.timeStamps["infight"] = self.frame
+
+		elif self.frame - self.timeStamps["move"] > 10:
+			self.state = "MOVE"
+			self.timeStamps["move"] = self.frame

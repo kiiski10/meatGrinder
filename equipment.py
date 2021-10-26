@@ -24,7 +24,7 @@ class Sword:
 		self.reach = 50
 		self.baseDamage = 30
 		self.level = level
-		self.weight = 15
+		self.weight = 80
 		self.condition = 100
 		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)
 
@@ -44,7 +44,7 @@ class Fist:
 		self.reach = 10
 		self.baseDamage = 2
 		self.level = 1
-		self.weight = 4
+		self.weight = 30
 		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)
 
 		self.hit = {

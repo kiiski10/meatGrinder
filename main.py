@@ -7,7 +7,7 @@ from equipment import *
 from grinder import Grinder
 from character import Fighter
 
-START_PLAYER_COUNT = 200
+START_PLAYER_COUNT = 10
 
 fighterInputs =	{
 	"A": [800, 200],
