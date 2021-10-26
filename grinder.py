@@ -27,6 +27,19 @@ class Grinder:
 		for f in self.fighters:
 			f.step(self.stats["step"])
 
+
+	def addBloodDrop(self, pos, dir, damage):
+		self.bloodDrops.append(
+			{
+				"spiltOnFrame": self.stats["step"],
+				"damage": damage,
+				"dir": dir,
+				"speed": 10,
+				"pos": pos
+			}
+		)
+
+
 	def renderBlood(self):
 		for b in self.bloodDrops:
 			lifeTime = self.stats["step"] - b["spiltOnFrame"]
