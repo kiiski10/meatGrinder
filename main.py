@@ -1,11 +1,13 @@
 import time, random, pygame
 
+TARGET_FPS = 30
 WINDOW_SIZE = [900, 500]
 displaySurf = pygame.display.set_mode(WINDOW_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)# | pygame.FULLSCREEN)
 pygame.display.init()
 from equipment import *
 from grinder import Grinder
 from character import Fighter
+
 
 START_PLAYER_COUNT = 1000
 
@@ -27,6 +29,7 @@ teams = {
 	}
 }
 
+clock = pygame.time.Clock()
 meatGrinder = Grinder(teams, fighterInputs, displaySurf)
 
 def addFighter(team, spawn, speed, equipment):
@@ -78,23 +81,23 @@ for i in range(plrCount):
 
 stepPerSecCounter = 0
 stepPerSecTimer = time.time()
-captionExtraText = ""
+winTitleExtraText = ""
 
 while running:
-	stepPerSecCounter += 1
-	if time.time() - stepPerSecTimer > 1:
-		captionExtraText = "FPS:{} PLRS:{} BLD:{}".format(stepPerSecCounter, plrCount - len(meatGrinder.dead), len(meatGrinder.bloodDrops))
+	if time.time() - stepPerSecTimer >= 1:
+		winTitleExtraText = "FPS:{}/{} PLRS:{} BLOOD:{}".format(stepPerSecCounter, TARGET_FPS, plrCount - len(meatGrinder.dead), len(meatGrinder.bloodDrops))
 		stepPerSecTimer = time.time()
 		stepPerSecCounter = 0
 
+	stepPerSecCounter += 1
 	running = handleEvents()
 	meatGrinder.debugLayer.fill((255, 0, 255))
 	displaySurf.fill((200, 200, 200))
 	meatGrinder.step()
 	meatGrinder.render(displaySurf)
 	pygame.display.flip()
-	pygame.display.set_caption("MeatGrinder | Fighters: {} | {}".format(plrCount - len(meatGrinder.dead), captionExtraText))
-	#time.sleep(0.00001)
+	pygame.display.set_caption("MeatGrinder | Fighters: {} | {}".format(plrCount - len(meatGrinder.dead), winTitleExtraText))
+	clock.tick(TARGET_FPS)
 
 
 pygame.quit()
