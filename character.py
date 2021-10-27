@@ -16,7 +16,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.center = team["fighterInputs"][spawnNr],
 		self.rect.x += random.randint(-20, 20)
-		self.rect.y = random.randint(0, 450)
+		self.rect.y = random.randint(0, 400)
 		self.enemyDetectionAreaSize = 350
 		self.dir = 45
 		self.speed = speed + random.randint(10, 30) / 10
@@ -102,7 +102,7 @@ class Fighter(pygame.sprite.Sprite):
 		damage = (hit["baseDamage"] * hit["level"]) * self.equipment["armor"].damageMultiplier
 		self.health -= damage
 		# print("{} got hit. damage: {}/{}".format(self.team["name"], damage, hit["baseDamage"]))
-		bloodAmount = int(damage / 10)
+		bloodAmount = int(damage / 6)
 		if bloodAmount < 1:
 			bloodAmount = 1
 

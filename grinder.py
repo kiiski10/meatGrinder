@@ -43,16 +43,22 @@ class Grinder:
 
 
 	def addBloodDrop(self, pos, dir, damage, color):
-		self.bloodDrops.append(
-			{
-				"spiltOnFrame": self.stats["step"],
-				"damage": damage,
-				"dir": dir,
-				"speed": 7,
-				"pos": pos,
-				"color": color
-			}
-		)
+		if len(self.bloodDrops) > 500:
+			draw = not random.randint(0, 2)
+		else:
+			draw = True
+
+		if draw:
+			self.bloodDrops.append(
+				{
+					"spiltOnFrame": self.stats["step"],
+					"damage": damage,
+					"dir": dir,
+					"speed": 7,
+					"pos": pos,
+					"color": color
+				}
+			)
 
 
 	def drawBlood(self):
