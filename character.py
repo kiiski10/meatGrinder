@@ -115,6 +115,19 @@ class Fighter(pygame.sprite.Sprite):
 			)
 		if self.health <= 0:
 			self.world.dead.append(self)
+			skeletonColors = [(155,155,105),(55,55,55)]
+			for i in range(2):
+				tint_color = skeletonColors[i-1]
+				bones = self.image.copy()
+				bones.fill((0, 0, 0, 205), None, pygame.BLEND_RGBA_MULT)
+				bones.fill(tint_color[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
+				self.world.bloodNcorpseLayer.blit(
+					bones,
+					(
+						self.centerPoint()[0] + i,
+						self.centerPoint()[1] + i
+					)
+				)
 			self.world.fighters.remove(self)
 			self.state = "DEAD"
 

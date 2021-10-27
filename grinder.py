@@ -8,7 +8,8 @@ class Grinder:
 		self.debugLayer = pygame.Surface(displaySurf.get_rect().size)
 		self.debugLayer.set_colorkey((255, 0, 255))
 		self.bloodNcorpseLayer = pygame.Surface(displaySurf.get_rect().size)
-		self.bloodNcorpseLayer.set_colorkey((0, 0, 0))
+		self.bloodNcorpseLayer.fill((255,255,255)) # TODO: draw the fight arena here
+		self.bloodNcorpseLayer.set_colorkey((255, 0, 255))
 		self.bloodDropLayer = pygame.Surface(displaySurf.get_rect().size)
 		self.bloodDropLayer.set_colorkey((0, 0, 0))
 		self.inputs = inputs # [{"name": "A", "pos": [x, y], "que": []}]

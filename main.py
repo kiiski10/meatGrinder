@@ -7,8 +7,8 @@ pygame.display.init()
 from equipment import *
 from grinder import Grinder
 from character import Fighter
-
-START_PLAYER_COUNT = 2000
+time.sleep(1)
+START_PLAYER_COUNT = 100
 
 fighterInputs =	{
 	"A": [800, 200],
