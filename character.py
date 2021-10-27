@@ -29,21 +29,29 @@ class Fighter(pygame.sprite.Sprite):
 		self.animFrame = 0
 		self.anim = [self.image]
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
+		self.equipment = {}
 
-		self.equipment = {
-			"weapon": Fist(),
-			"armor": Skin(),
-		}
-
+		usedCategories = []
 		for e in selectedEquipment:
-			#print("EQUIP:", e.category, e.name)
+			usedCategories.append(e.category)
 			if e.category == "armor":
 				self.equipment["armor"] = e
 
 			elif e.category == "weapon":
 				self.equipment["weapon"] = e
 
-			self.image.blit(e.image, [0, 0])
+			else:
+				if not e.category in self.equipment:
+					self.equipment[e.category] = [e]
+				else:
+					self.equipment[e.category].append(e)
+
+		for i in self.equipment:
+			if type(self.equipment[i]) == list:
+				for e in self.equipment[i]:
+					self.image.blit(e.image, [0, 0])
+			else:
+				self.image.blit(self.equipment[i].image, [0, 0])
 
 		self.timeStamps = {
 			"hit": random.randint(0, self.equipment["weapon"].weight),

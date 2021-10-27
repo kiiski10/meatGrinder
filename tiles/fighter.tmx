@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="5" height="10" tilewidth="48" tileheight="48" infinite="0" nextlayerid="2" nextobjectid="1">
- <tileset firstgid="1" name="fighter" tilewidth="48" tileheight="48" tilecount="36" columns="6">
-  <image source="fighter.png" width="288" height="288"/>
+ <tileset firstgid="1" name="fighter" tilewidth="48" tileheight="48" tilecount="48" columns="6">
+  <image source="fighter.png" width="288" height="400"/>
  </tileset>
  <layer id="1" name="Tile Layer 1" width="5" height="10">
   <data encoding="csv">
@@ -11,7 +11,7 @@
 19,0,0,0,0,
 25,0,0,0,0,
 31,0,0,0,0,
-0,0,0,0,0,
+43,0,0,0,0,
 0,0,0,0,0,
 0,0,0,0,0,
 0,0,0,0,0

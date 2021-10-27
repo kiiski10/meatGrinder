@@ -12,8 +12,7 @@ SPRITE_ROW_MAPPING = {
 	"shirt": 3,
 	"pants": 4,
 	"hair": 5,
-	"skin": 6,
-	"fist": 7,
+	"fist": 6,
 }
 
 class Sword:
@@ -57,7 +56,7 @@ class Fist:
 
 class Skin:
 	def __init__(self):
-		self.name = "skin"
+		self.name = "body"
 		self.category = "armor"
 		self.level = 1
 		self.damageMultiplier = 1
