@@ -81,7 +81,6 @@ for i in range(START_PLAYER_COUNT):
 
 stepPerSecCounter = 0
 stepPerSecTimer = time.time()
-winTitleExtraText = ""
 winTitleExtraText = "FPS:{}/{} BLOOD:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops))
 
 while running:
