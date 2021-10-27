@@ -8,7 +8,7 @@ from equipment import *
 from grinder import Grinder
 from character import Fighter
 
-START_PLAYER_COUNT = 10
+START_PLAYER_COUNT = 2000
 
 fighterInputs =	{
 	"A": [800, 200],
@@ -68,9 +68,8 @@ def	randomEquipments(n):
 pygame.event.get()
 running = True
 
-plrCount = START_PLAYER_COUNT
 c = 0
-for i in range(plrCount):
+for i in range(START_PLAYER_COUNT):
 	c += 1
 	if c > 1:
 		c = 0
@@ -83,13 +82,9 @@ for i in range(plrCount):
 stepPerSecCounter = 0
 stepPerSecTimer = time.time()
 winTitleExtraText = ""
+winTitleExtraText = "FPS:{}/{} BLOOD:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops))
 
 while running:
-	if time.time() - stepPerSecTimer >= 1:
-		winTitleExtraText = "FPS:{}/{} BLOOD:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops))
-		stepPerSecTimer = time.time()
-		stepPerSecCounter = 0
-
 	stepPerSecCounter += 1
 	running = handleEvents()
 	displaySurf.fill((200, 200, 200))
@@ -97,9 +92,18 @@ while running:
 	meatGrinder.step()
 	meatGrinder.render(displaySurf)
 	pygame.display.flip()
-	pygame.display.set_caption("MeatGrinder | Fighters: {} | {}".format(plrCount - len(meatGrinder.dead), winTitleExtraText))
-	clock.tick(TARGET_FPS)
 
+	spawnTime = not random.randint(0, 10)
+	if spawnTime:
+		speed = random.randint(20, 60) / 10
+		addFighter(random.sample(list(teams), 1)[0], 0, speed, randomEquipments(3))
+
+	if time.time() - stepPerSecTimer >= 1:
+		winTitleExtraText = "FPS:{}/{} BLOOD:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops))
+		stepPerSecTimer = time.time()
+		stepPerSecCounter = 0
+	pygame.display.set_caption("MeatGrinder | Fighters: {} | {}".format(len(meatGrinder.fighters), winTitleExtraText))
+	clock.tick(TARGET_FPS)
 
 pygame.quit()
 print("QUIT BYE")
