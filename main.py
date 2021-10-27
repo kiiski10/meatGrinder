@@ -1,6 +1,6 @@
 import time, random, pygame
 
-TARGET_FPS = 2
+TARGET_FPS = 30
 WINDOW_SIZE = [900, 500]
 START_PLAYER_COUNT = 10
 

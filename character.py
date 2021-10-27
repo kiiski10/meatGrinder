@@ -63,7 +63,6 @@ class Fighter(pygame.sprite.Sprite):
 			}
 		}
 
-
 		self.anim = {
 			"MOVE": {
 				"E": [],
