@@ -30,14 +30,6 @@ class Fighter(pygame.sprite.Sprite):
 		self.anim = [self.image]
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
 
-		self.timeStamps = {
-			"spawn": 0,
-			"hit": 0,
-			"stun": 0,
-			"move": 0,
-			"search": 0,
-		}
-
 		self.equipment = {
 			"weapon": Fist(),
 			"armor": Skin(),
@@ -53,6 +45,12 @@ class Fighter(pygame.sprite.Sprite):
 
 			self.image.blit(e.image, [0, 0])
 
+		self.timeStamps = {
+			"hit": random.randint(0, self.equipment["weapon"].weight),
+			"stun": 0,
+			"move": 0,
+			"search": 0,
+		}
 
 		colorToReplace = (255,0,0)
 		pa = pygame.PixelArray(self.image)
@@ -93,7 +91,7 @@ class Fighter(pygame.sprite.Sprite):
 		# change animation frame
 		self.animFrame += 1
 		if self.animFrame >= len(self.anim):
-			self.animFrame = 0
+			self.animFrame -= len(self.anim)
 		self.image = self.anim[self.animFrame]
 		self.rect.center = utilities.angleDistToPos(self.rect.center, self.dir, 1.1 * self.speed)
 
@@ -111,7 +109,7 @@ class Fighter(pygame.sprite.Sprite):
 				self.centerPoint(),
 				angle + random.randint(-10,10),
 				damage + random.randint(7,10),
-				(155 + random.randint(0, 100) , 0, 0)
+				((255 - random.randint(0, 55)) - damage , 0 + damage, 0 + damage)
 			)
 		if self.health <= 0:
 			self.world.dead.append(self)
@@ -119,13 +117,13 @@ class Fighter(pygame.sprite.Sprite):
 			for i in range(2):
 				tint_color = skeletonColors[i-1]
 				bones = self.image.copy()
-				bones.fill((0, 0, 0, 205), None, pygame.BLEND_RGBA_MULT)
+				bones.fill((0, 0, 0, 175), None, pygame.BLEND_RGBA_MULT)
 				bones.fill(tint_color[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
 				self.world.bloodNcorpseLayer.blit(
 					bones,
 					(
-						self.centerPoint()[0] + i,
-						self.centerPoint()[1] + i
+						self.centerPoint()[0] - i,
+						self.centerPoint()[1] - i
 					)
 				)
 			self.world.fighters.remove(self)
@@ -241,4 +239,3 @@ class Fighter(pygame.sprite.Sprite):
 
 		if dist < self.equipment["weapon"].reach:
 			self.state = "INFIGHT"
-			self.timeStamps["infight"] = self.frame
