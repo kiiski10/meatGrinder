@@ -2,13 +2,15 @@ import time, random, pygame
 
 TARGET_FPS = 30
 WINDOW_SIZE = [900, 500]
+START_PLAYER_COUNT = 10
+
 displaySurf = pygame.display.set_mode(WINDOW_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)# | pygame.FULLSCREEN)
 pygame.display.init()
 from equipment import *
 from grinder import Grinder
 from character import Fighter
+
 time.sleep(1)
-START_PLAYER_COUNT = 100
 
 fighterInputs =	{
 	"A": [800, 200],
@@ -16,15 +18,15 @@ fighterInputs =	{
 }
 
 teams = {
-	"red": {
-		"name": "red",
-		"color": (170, 40, 40),
+	"yellow": {
+		"name": "yellow",
+		"color": (255, 187, 20),
 		"fighterInputs": [fighterInputs["A"]],
 		"primaryTarget": fighterInputs["B"]
 	},
 	"blue": {
 		"name": "blue",
-		"color": (40, 40, 170),
+		"color": (25, 175, 255),
 		"fighterInputs": [fighterInputs["B"]],
 		"primaryTarget": fighterInputs["A"]
 	}
@@ -57,7 +59,7 @@ def handleEvents():
 
 def randomEquipments(n):
 	equipmentAvailable = [Sword(), Shield(), Shirt(), Pants(), Hair()]
-	selectedEquipment = []
+	selectedEquipment = [Skin(), Fist()]
 	while len(selectedEquipment) < n:
 		e = random.choice(equipmentAvailable)
 		if e not in selectedEquipment:
@@ -73,7 +75,7 @@ for i in range(START_PLAYER_COUNT):
 	c += 1
 	if c > 1:
 		c = 0
-		team = "red"
+		team = "yellow"
 	else:
 		team = "blue"
 	speed = random.randint(20, 60) / 10
@@ -81,7 +83,7 @@ for i in range(START_PLAYER_COUNT):
 
 stepPerSecCounter = 0
 stepPerSecTimer = time.time()
-winTitleExtraText = "FPS:{}/{} BLOOD:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops))
+winTitleExtraText = "FPS:{}/{} | BLOOD:{} | STEP:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops), meatGrinder.stats["step"])
 
 while running:
 	stepPerSecCounter += 1
@@ -98,7 +100,7 @@ while running:
 		addFighter(random.sample(list(teams), 1)[0], 0, speed, randomEquipments(3))
 
 	if time.time() - stepPerSecTimer >= 1:
-		winTitleExtraText = "FPS:{}/{} BLOOD:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops))
+		winTitleExtraText = "FPS:{}/{} | BLOOD:{} | STEP:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops), meatGrinder.stats["step"])
 		stepPerSecTimer = time.time()
 		stepPerSecCounter = 0
 	pygame.display.set_caption("MeatGrinder | Fighters: {} | {}".format(len(meatGrinder.fighters), winTitleExtraText))

@@ -27,37 +27,76 @@ class Fighter(pygame.sprite.Sprite):
 		self.target = None
 		self.frame = 0
 		self.animFrame = 0
-		self.anim = [self.image]
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
+		self.equipment = {}
 
-		self.timeStamps = {
-			"spawn": 0,
-			"hit": 0,
-			"stun": 0,
-			"move": 0,
-			"search": 0,
-		}
-
-		self.equipment = {
-			"weapon": Fist(),
-			"armor": Skin(),
-		}
-
+		usedCategories = []
 		for e in selectedEquipment:
-			#print("EQUIP:", e.category, e.name)
+			usedCategories.append(e.category)
 			if e.category == "armor":
 				self.equipment["armor"] = e
 
 			elif e.category == "weapon":
 				self.equipment["weapon"] = e
 
-			self.image.blit(e.image, [0, 0])
+			else:
+				if not e.category in self.equipment:
+					self.equipment[e.category] = [e]
+				else:
+					self.equipment[e.category].append(e)
 
+		ANIM_MAPPING = {
+			"directions": {
+				"E": [0,4],
+				"W": [4,8],
+				"N": [8,12],
+				"S": [12,16]
+			},
+			"equipment": {
+				"sword": 1,
+				"shield": 2,
+				"shirt": 3,
+				"pants": 4,
+				"hair": 5,
+				"shoes": 6,
+				"fist": 7,
+			}
+		}
+
+		self.anim = {
+			"MOVE": {
+				"E": [],
+				"W": [],
+				"N": [],
+				"S": []
+			}
+		}
+
+		for i in self.equipment:
+			if type(self.equipment[i]) == list:
+				for e in self.equipment[i]:
+					self.image.blit(e.image, [0, 0])
+			else:
+				self.image.blit(self.equipment[i].image, [0, 0])
+
+		self.timeStamps = {
+			"hit": random.randint(0, self.equipment["weapon"].weight),
+			"stun": 0,
+			"move": 0,
+			"search": 0,
+		}
 
 		colorToReplace = (255,0,0)
 		pa = pygame.PixelArray(self.image)
 		pa.replace(colorToReplace, self.team["color"])
 
+
+		# generate anim frames
+		for d in ANIM_MAPPING["directions"]:
+			xrange = range(ANIM_MAPPING["directions"][d][0], ANIM_MAPPING["directions"][d][1])
+			for frame in xrange:
+				sprite = fighterTiles.get_tile_image(frame, 0, 0)
+				self.anim["MOVE"][d].append(sprite)
 
 	def centerPoint(self):
 		return [
@@ -88,13 +127,12 @@ class Fighter(pygame.sprite.Sprite):
 		else:
 			return(pygame.Rect(self.team["primaryTarget"], (20, 20)))
 
-
 	def move(self):
 		# change animation frame
 		self.animFrame += 1
-		if self.animFrame >= len(self.anim):
-			self.animFrame = 0
-		self.image = self.anim[self.animFrame]
+		if self.animFrame >= len(self.anim[self.state][utilities.dirAsCompassDir(self.dir)]):
+			self.animFrame -= len(self.anim[self.state][utilities.dirAsCompassDir(self.dir)])
+		self.image = self.anim["MOVE"][utilities.dirAsCompassDir(self.dir)][self.animFrame]
 		self.rect.center = utilities.angleDistToPos(self.rect.center, self.dir, 1.1 * self.speed)
 
 
@@ -111,7 +149,7 @@ class Fighter(pygame.sprite.Sprite):
 				self.centerPoint(),
 				angle + random.randint(-10,10),
 				damage + random.randint(7,10),
-				(155 + random.randint(0, 100) , 0, 0)
+				((255 - random.randint(0, 55)) - damage , 0 + damage, 0 + damage)
 			)
 		if self.health <= 0:
 			self.world.dead.append(self)
@@ -119,13 +157,13 @@ class Fighter(pygame.sprite.Sprite):
 			for i in range(2):
 				tint_color = skeletonColors[i-1]
 				bones = self.image.copy()
-				bones.fill((0, 0, 0, 205), None, pygame.BLEND_RGBA_MULT)
+				bones.fill((0, 0, 0, 175), None, pygame.BLEND_RGBA_MULT)
 				bones.fill(tint_color[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
 				self.world.bloodNcorpseLayer.blit(
 					bones,
 					(
-						self.centerPoint()[0] + i,
-						self.centerPoint()[1] + i
+						self.centerPoint()[0] - i,
+						self.centerPoint()[1] - i
 					)
 				)
 			self.world.fighters.remove(self)
@@ -241,4 +279,3 @@ class Fighter(pygame.sprite.Sprite):
 
 		if dist < self.equipment["weapon"].reach:
 			self.state = "INFIGHT"
-			self.timeStamps["infight"] = self.frame

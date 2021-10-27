@@ -81,8 +81,19 @@ class Grinder:
 				targetLayer = self.bloodDropLayer
 				color = b["color"]
 
+				hilight = pygame.Rect((0,0), (bloodSize, bloodSize))
+				hilight.center = [x - 1, y - 1]
+
+				pygame.draw.rect(
+					targetLayer,
+					(250,150,150),
+					hilight,
+					2
+				)
+
 			drop = pygame.Rect((0,0), (bloodSize, bloodSize))
 			drop.center = [x, y]
+
 
 			pygame.draw.rect(
 				targetLayer,
