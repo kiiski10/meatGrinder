@@ -27,7 +27,6 @@ class Fighter(pygame.sprite.Sprite):
 		self.target = None
 		self.frame = 0
 		self.animFrame = 0
-		self.anim = [self.image]
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
 		self.equipment = {}
 
@@ -46,6 +45,28 @@ class Fighter(pygame.sprite.Sprite):
 				else:
 					self.equipment[e.category].append(e)
 
+		ANIM_MAPPING = {
+			"MOVE": {
+				"E": [0,4],
+				"W": [4,8],
+				"N": [8,12],
+				"S": [12,16]
+			}
+		}
+
+
+		# generate anim frames
+		self.anim = {
+			"MOVE": {
+				"E": [],
+				"W": [],
+				"N": [],
+				"S": []
+			}
+		}
+
+		compassDirections = ["E", "W", "N", "S", ]
+
 		for i in self.equipment:
 			if type(self.equipment[i]) == list:
 				for e in self.equipment[i]:
@@ -63,6 +84,11 @@ class Fighter(pygame.sprite.Sprite):
 		colorToReplace = (255,0,0)
 		pa = pygame.PixelArray(self.image)
 		pa.replace(colorToReplace, self.team["color"])
+
+		for d in compassDirections:
+			xrange = range(ANIM_MAPPING["MOVE"][d][0], ANIM_MAPPING["MOVE"][d][1])
+			for x in xrange:
+				self.anim["MOVE"][d].append(fighterTiles.get_tile_image(x, 0, 0))
 
 
 	def centerPoint(self):
@@ -94,13 +120,12 @@ class Fighter(pygame.sprite.Sprite):
 		else:
 			return(pygame.Rect(self.team["primaryTarget"], (20, 20)))
 
-
 	def move(self):
 		# change animation frame
 		self.animFrame += 1
-		if self.animFrame >= len(self.anim):
-			self.animFrame -= len(self.anim)
-		self.image = self.anim[self.animFrame]
+		if self.animFrame >= len(self.anim[self.state][utilities.dirAsCompassDir(self.dir)]):
+			self.animFrame -= len(self.anim[self.state][utilities.dirAsCompassDir(self.dir)]) + 1
+		self.image = self.anim["MOVE"][utilities.dirAsCompassDir(self.dir)][self.animFrame]
 		self.rect.center = utilities.angleDistToPos(self.rect.center, self.dir, 1.1 * self.speed)
 
 

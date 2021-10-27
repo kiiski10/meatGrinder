@@ -20,3 +20,15 @@ def angleDistToPos(pos, angle, dist):
 	x = movement.x + pos[0]
 	y = movement.y + pos[1]
 	return(x,y)
+
+def dirAsCompassDir(degrees):
+	degrees = int(degrees)
+	if degrees >= 225 and degrees <= 315:
+		compassDir = "N"
+	elif degrees >= 45 and degrees <= 135:
+		compassDir = "S"
+	elif degrees >= 135 and degrees <= 225:
+		compassDir = "W"
+	elif degrees >= 315 or degrees <= 45:
+		compassDir = "E"
+	return(compassDir)
