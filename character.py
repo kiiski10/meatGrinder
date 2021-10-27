@@ -46,16 +46,24 @@ class Fighter(pygame.sprite.Sprite):
 					self.equipment[e.category].append(e)
 
 		ANIM_MAPPING = {
-			"MOVE": {
+			"directions": {
 				"E": [0,4],
 				"W": [4,8],
 				"N": [8,12],
 				"S": [12,16]
+			},
+			"equipment": {
+				"sword": 1,
+				"shield": 2,
+				"shirt": 3,
+				"pants": 4,
+				"hair": 5,
+				"shoes": 6,
+				"fist": 7,
 			}
 		}
 
 
-		# generate anim frames
 		self.anim = {
 			"MOVE": {
 				"E": [],
@@ -64,8 +72,6 @@ class Fighter(pygame.sprite.Sprite):
 				"S": []
 			}
 		}
-
-		compassDirections = ["E", "W", "N", "S", ]
 
 		for i in self.equipment:
 			if type(self.equipment[i]) == list:
@@ -85,11 +91,13 @@ class Fighter(pygame.sprite.Sprite):
 		pa = pygame.PixelArray(self.image)
 		pa.replace(colorToReplace, self.team["color"])
 
-		for d in compassDirections:
-			xrange = range(ANIM_MAPPING["MOVE"][d][0], ANIM_MAPPING["MOVE"][d][1])
-			for x in xrange:
-				self.anim["MOVE"][d].append(fighterTiles.get_tile_image(x, 0, 0))
 
+		# generate anim frames
+		for d in ANIM_MAPPING["directions"]:
+			xrange = range(ANIM_MAPPING["directions"][d][0], ANIM_MAPPING["directions"][d][1])
+			for frame in xrange:
+				sprite = fighterTiles.get_tile_image(frame, 0, 0)
+				self.anim["MOVE"][d].append(sprite)
 
 	def centerPoint(self):
 		return [
@@ -124,7 +132,7 @@ class Fighter(pygame.sprite.Sprite):
 		# change animation frame
 		self.animFrame += 1
 		if self.animFrame >= len(self.anim[self.state][utilities.dirAsCompassDir(self.dir)]):
-			self.animFrame -= len(self.anim[self.state][utilities.dirAsCompassDir(self.dir)]) + 1
+			self.animFrame -= len(self.anim[self.state][utilities.dirAsCompassDir(self.dir)])
 		self.image = self.anim["MOVE"][utilities.dirAsCompassDir(self.dir)][self.animFrame]
 		self.rect.center = utilities.angleDistToPos(self.rect.center, self.dir, 1.1 * self.speed)
 
