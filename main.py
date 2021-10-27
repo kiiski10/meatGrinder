@@ -55,7 +55,7 @@ def handleEvents():
 				return(False)
 	return(True)
 
-def	randomEquipments(n):
+def randomEquipments(n):
 	equipmentAvailable = [Sword(), Shield(), Shirt(), Pants(), Hair()]
 	selectedEquipment = []
 	while len(selectedEquipment) < n:
