@@ -2,7 +2,7 @@ import time, random, pygame
 
 TARGET_FPS = 30
 WINDOW_SIZE = [900, 500]
-START_PLAYER_COUNT = 10
+START_PLAYER_COUNT = 1000
 
 displaySurf = pygame.display.set_mode(WINDOW_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)# | pygame.FULLSCREEN)
 pygame.display.init()
@@ -58,7 +58,7 @@ def handleEvents():
 	return(True)
 
 def randomEquipments(n):
-	equipmentAvailable = [Sword(), Shield(), Shirt(), Pants(), Hair()]
+	equipmentAvailable = [Sword(), Shield(), Shirt(), Pants(), Hair(), Shoes()]
 	selectedEquipment = [Skin(), Fist()]
 	while len(selectedEquipment) < n:
 		e = random.choice(equipmentAvailable)

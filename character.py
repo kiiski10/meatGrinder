@@ -177,8 +177,8 @@ class Fighter(pygame.sprite.Sprite):
 				self.world.bloodNcorpseLayer.blit(
 					bones,
 					(
-						self.centerPoint()[0] - i,
-						self.centerPoint()[1] - i
+						self.rect.center[0] - i,
+						self.rect.center[1] - i
 					)
 				)
 			self.world.fighters.remove(self)
