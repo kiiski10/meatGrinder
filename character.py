@@ -88,9 +88,7 @@ class Fighter(pygame.sprite.Sprite):
 			"search": 0,
 		}
 
-		colorToReplace = (255,0,0)
-		pa = pygame.PixelArray(self.image)
-		pa.replace(colorToReplace, self.team["color"])
+		#self.image = utilities.changeColor(self.image, self.team["color"])
 
 		# generate anim frames
 		for d in ANIM_MAPPING["directions"]:
@@ -112,7 +110,8 @@ class Fighter(pygame.sprite.Sprite):
 				elif "weapon" in self.equipment:
 					sprite.blit(e.anim[d][f], [0, 0])
 
-				self.anim["MOVE"][d][f].blit(sprite, [0, 0])
+				colored = utilities.changeColor(sprite, self.team["color"])
+				self.anim["MOVE"][d][f].blit(utilities.changeColor(colored, self.team["color"]), [0, 0])
 
 	def centerPoint(self):
 		return [

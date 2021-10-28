@@ -32,3 +32,9 @@ def dirAsCompassDir(degrees):
 	elif degrees >= 315 or degrees <= 45:
 		compassDir = "E"
 	return(compassDir)
+
+def changeColor(image, replaceWith):
+	toReplace = (255,0,0)
+	pa = pygame.PixelArray(image)
+	pa.replace(toReplace, replaceWith)
+	return(pa.make_surface())
