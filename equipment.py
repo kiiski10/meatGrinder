@@ -5,6 +5,31 @@ from pytmx import load_pygame
 APP_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
 fighterTiles = load_pygame(os.path.join(APP_PATH, "tiles", "fighter.tmx"))
 
+
+def loadFrames(name):
+
+	compassDirections = [
+		"E",
+		"W",
+		"N",
+		"S"
+	]
+
+	anim = {
+		"E": [],
+		"W": [],
+		"N": [],
+		"S": []
+	}
+
+	x = 0
+	for d in compassDirections:
+		for frame in range(0, 4):
+			anim[d].append(fighterTiles.get_tile_image(x, SPRITE_ROW_MAPPING[name], 0))
+			x += 1
+	return(anim)
+
+
 SPRITE_ROW_MAPPING = {
 	"body": 0,
 	"sword": 1,
@@ -26,6 +51,7 @@ class Sword:
 		self.weight = 80
 		self.condition = 100
 		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)
+		self.anim = loadFrames(self.name)
 
 		self.hit = {
 			"type": self.type,
@@ -46,6 +72,8 @@ class Fist:
 		self.weight = 30
 		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)
 
+		self.anim = loadFrames(self.name)
+
 		self.hit = {
 			"type": self.type,
 			"baseDamage": self.baseDamage,
@@ -62,7 +90,9 @@ class Skin:
 		self.damageMultiplier = 1
 		self.condition = 100
 		self.weaknesses = [] # [{"type": "blunt", "multiplier": 0.5}, {...}]
-		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)
+		self.anim = loadFrames(self.name)
+
+
 
 
 class Shield:
@@ -74,6 +104,8 @@ class Shield:
 		self.condition = 100
 		self.weaknesses = [] # [{"type": "blunt", "multiplier": 0.5}, {...}]
 		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)
+		self.anim = loadFrames(self.name)
+
 
 
 class Shirt:
@@ -81,6 +113,8 @@ class Shirt:
 		self.name = "shirt"
 		self.category = "clothing"
 		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)
+		self.anim = loadFrames(self.name)
+
 
 
 class Pants:
@@ -88,6 +122,8 @@ class Pants:
 		self.name = "pants"
 		self.category = "clothing"
 		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)
+		self.anim = loadFrames(self.name)
+
 
 
 class Hair:
@@ -95,3 +131,4 @@ class Hair:
 		self.name = "hair"
 		self.category = "clothing"
 		self.image = fighterTiles.get_tile_image(0, SPRITE_ROW_MAPPING[self.name], 0)
+		self.anim = loadFrames(self.name)

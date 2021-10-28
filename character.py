@@ -47,10 +47,10 @@ class Fighter(pygame.sprite.Sprite):
 
 		ANIM_MAPPING = {
 			"directions": {
-				"E": [0,4],
-				"W": [4,8],
-				"N": [8,12],
-				"S": [12,16]
+				"E": 0,
+				"W": 4,
+				"N": 8,
+				"S": 12
 			},
 			"equipment": {
 				"sword": 1,
@@ -63,6 +63,15 @@ class Fighter(pygame.sprite.Sprite):
 			}
 		}
 
+		placeholders = []
+		placeholder = pygame.Surface((10, 10))
+		colors = [(170,30,30), (30,170,30), (30,30,170), (100,100,100)]
+		for ph in range(0, 4):
+			copy = placeholder.copy()
+			copy.fill(colors[ph])
+			placeholders.append(copy)
+
+		# [placeholders[0], placeholders[1], placeholders[2], placeholders[3]]
 		self.anim = {
 			"MOVE": {
 				"E": [],
@@ -71,13 +80,6 @@ class Fighter(pygame.sprite.Sprite):
 				"S": []
 			}
 		}
-
-		for i in self.equipment:
-			if type(self.equipment[i]) == list:
-				for e in self.equipment[i]:
-					self.image.blit(e.image, [0, 0])
-			else:
-				self.image.blit(self.equipment[i].image, [0, 0])
 
 		self.timeStamps = {
 			"hit": random.randint(0, self.equipment["weapon"].weight),
@@ -90,13 +92,27 @@ class Fighter(pygame.sprite.Sprite):
 		pa = pygame.PixelArray(self.image)
 		pa.replace(colorToReplace, self.team["color"])
 
-
 		# generate anim frames
 		for d in ANIM_MAPPING["directions"]:
-			xrange = range(ANIM_MAPPING["directions"][d][0], ANIM_MAPPING["directions"][d][1])
-			for frame in xrange:
-				sprite = fighterTiles.get_tile_image(frame, 0, 0)
-				self.anim["MOVE"][d].append(sprite)
+			frames = []
+			for frame in range(0 + ANIM_MAPPING["directions"][d], 4 + ANIM_MAPPING["directions"][d]):
+				frames.append(fighterTiles.get_tile_image(frame, 0, 0).copy())
+
+			self.anim["MOVE"][d] = frames
+
+			sprite = pygame.Surface(self.rect.size, pygame.SRCALPHA)
+			sprite.set_colorkey((255,0,255))
+			sprite.fill((255,0,255, 0))
+			for f in range(0, 4):
+				if "clothing" in self.equipment:
+					for e in self.equipment["clothing"]:
+						sprite.blit(e.anim[d][f], [0, 0])
+				elif "armor" in self.equipment:
+					sprite.blit(e.anim[d][f], [0, 0])
+				elif "weapon" in self.equipment:
+					sprite.blit(e.anim[d][f], [0, 0])
+
+				self.anim["MOVE"][d][f].blit(sprite, [0, 0])
 
 	def centerPoint(self):
 		return [
