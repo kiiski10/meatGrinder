@@ -2,7 +2,7 @@ import time, random, pygame
 
 TARGET_FPS = 30
 WINDOW_SIZE = [900, 500]
-START_PLAYER_COUNT = 1000
+START_PLAYER_COUNT = 10
 
 displaySurf = pygame.display.set_mode(WINDOW_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)# | pygame.FULLSCREEN)
 pygame.display.init()

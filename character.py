@@ -63,15 +63,6 @@ class Fighter(pygame.sprite.Sprite):
 			}
 		}
 
-		placeholders = []
-		placeholder = pygame.Surface((10, 10))
-		colors = [(170,30,30), (30,170,30), (30,30,170), (100,100,100)]
-		for ph in range(0, 4):
-			copy = placeholder.copy()
-			copy.fill(colors[ph])
-			placeholders.append(copy)
-
-		# [placeholders[0], placeholders[1], placeholders[2], placeholders[3]]
 		self.anim = {
 			"MOVE": {
 				"E": [],
@@ -88,7 +79,6 @@ class Fighter(pygame.sprite.Sprite):
 			"search": 0,
 		}
 
-		#self.image = utilities.changeColor(self.image, self.team["color"])
 
 		# generate anim frames
 		for d in ANIM_MAPPING["directions"]:
@@ -113,11 +103,13 @@ class Fighter(pygame.sprite.Sprite):
 				colored = utilities.changeColor(sprite, self.team["color"])
 				self.anim["MOVE"][d][f].blit(utilities.changeColor(colored, self.team["color"]), [0, 0])
 
+
 	def centerPoint(self):
 		return [
 			int(self.rect.center[0] + self.rect.width / 2),
 			int(self.rect.center[1] + self.rect.height / 2)
 		]
+
 
 	def getDetectionRect(self):
 		w = self.enemyDetectionAreaSize
@@ -259,7 +251,6 @@ class Fighter(pygame.sprite.Sprite):
 			y = self.rect.y + self.rect.height * 1.5
 			self.world.debugLayer.blit(textsurface,(x,y))
 
-
 		if self.state == "SEARCH":
 			self.target = self.findTarget()
 			self.dir = utilities.angleTo(self.rect.center, self.target.center)
@@ -275,7 +266,14 @@ class Fighter(pygame.sprite.Sprite):
 			self.state = "SEARCH"
 
 		elif self.state == "MOVE":
-			self.move()
+
+			if dist < self.equipment["weapon"].reach * 3:
+				oldSpeed = self.speed
+				self.speed *= 0.5
+				self.move()
+				self.speed = oldSpeed
+			else:
+				self.move()
 
 		elif self.state == "INFIGHT":
 			if self.frame - self.timeStamps["hit"] > self.equipment["weapon"].weight:
