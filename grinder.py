@@ -2,15 +2,15 @@ import pygame, random
 import utilities
 
 class Grinder:
-	def __init__(self, teams, inputs, displaySurf):
+	def __init__(self, teams, inputs):
 		print("grinder init")
-		self.displaySurf = displaySurf
-		self.debugLayer = pygame.Surface(displaySurf.get_rect().size)
+		self.surface = pygame.Surface((1000, 900))
+		self.debugLayer = pygame.Surface(self.surface.get_rect().size)
 		self.debugLayer.set_colorkey((255, 0, 255))
-		self.bloodNcorpseLayer = pygame.Surface(displaySurf.get_rect().size)
+		self.bloodNcorpseLayer = pygame.Surface(self.surface.get_rect().size)
 		self.bloodNcorpseLayer.fill((255,255,255)) # TODO: draw the fight arena here
 		self.bloodNcorpseLayer.set_colorkey((255, 0, 255))
-		self.bloodDropLayer = pygame.Surface(displaySurf.get_rect().size)
+		self.bloodDropLayer = pygame.Surface(self.surface.get_rect().size)
 		self.bloodDropLayer.set_colorkey((0, 0, 0))
 		self.inputs = inputs # [{"name": "A", "pos": [x, y], "que": []}]
 		self.fighters = []
@@ -103,12 +103,12 @@ class Grinder:
 			)
 
 		pygame.Surface.blit(
-			self.displaySurf,
+			self.surface,
 			self.bloodNcorpseLayer,
 			[0, 0]
 		)
 		pygame.Surface.blit(
-			self.displaySurf,
+			self.surface,
 			self.bloodDropLayer,
 			[0, 0]
 		)
@@ -116,13 +116,13 @@ class Grinder:
 	def listEnemies(self, team):
 		return(list(filter(lambda x: x.team["name"] != team, self.fighters)))
 
-	def render(self, displaySurf):
+	def render(self):
 		self.drawBlood()
 
 		# renderFighters
 		for f in self.fighters:
 			pygame.Surface.blit(
-				displaySurf,
+				self.surface,
 				f.image,
 				f.rect.center
 			)
@@ -130,7 +130,7 @@ class Grinder:
 		# render debug layer
 		if self.debug:
 			pygame.Surface.blit(
-				displaySurf,
+				self.surface,
 				self.debugLayer,
 				[0, 0]
 			)
