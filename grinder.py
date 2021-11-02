@@ -4,7 +4,7 @@ import utilities
 class Grinder:
 	def __init__(self, teams, inputs):
 		print("grinder init")
-		self.surface = pygame.Surface((1000, 900))
+		self.surface = pygame.Surface((1000, 600))
 		self.debugLayer = pygame.Surface(self.surface.get_rect().size)
 		self.debugLayer.set_colorkey((255, 0, 255))
 		self.bloodNcorpseLayer = pygame.Surface(self.surface.get_rect().size)

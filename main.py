@@ -2,7 +2,7 @@ import time, random, pygame
 
 TARGET_FPS = 30
 
-WINDOW_SIZE = [1900, 910]
+WINDOW_SIZE = [1900, 792]
 START_PLAYER_COUNT = 30
 
 displaySurf = pygame.display.set_mode(WINDOW_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)# | pygame.FULLSCREEN)
@@ -89,11 +89,12 @@ winTitleExtraText = "FPS:{}/{} | BLOOD:{} | STEP:{}".format(stepPerSecCounter, T
 while running:
 	stepPerSecCounter += 1
 	running = handleEvents()
-	displaySurf.fill((20, 20, 20))
-	meatGrinder.debugLayer.fill((255,0,255))
+	displaySurf.fill((120, 120, 120))
+	meatGrinder.debugLayer.fill((255, 0, 255))
 	meatGrinder.step()
 	meatGrinder.render()
-	displaySurf.blit(meatGrinder.surface, (5,5))
+	grinderYPos = (displaySurf.get_height() - meatGrinder.surface.get_height()) / 2
+	displaySurf.blit(meatGrinder.surface, (5, grinderYPos))
 	pygame.display.flip()
 
 	spawnTime = not random.randint(0, 10)
