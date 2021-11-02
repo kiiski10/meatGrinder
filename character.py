@@ -1,5 +1,6 @@
 import random, pygame
 import utilities
+import animation
 from equipment import *
 
 pygame.font.init()
@@ -45,24 +46,6 @@ class Fighter(pygame.sprite.Sprite):
 				else:
 					self.equipment[e.category].append(e)
 
-		ANIM_MAPPING = {
-			"directions": {
-				"E": 0,
-				"W": 4,
-				"N": 8,
-				"S": 12
-			},
-			"equipment": {
-				"sword": 1,
-				"shield": 2,
-				"shirt": 3,
-				"pants": 4,
-				"hair": 5,
-				"shoes": 6,
-				"fist": 7,
-			}
-		}
-
 		self.anim = {
 			"MOVE": {
 				"E": [],
@@ -79,11 +62,10 @@ class Fighter(pygame.sprite.Sprite):
 			"search": 0,
 		}
 
-
 		# generate anim frames
-		for d in ANIM_MAPPING["directions"]:
+		for d in animation.ANIM_MAPPING["directions"]:
 			frames = []
-			for frame in range(0 + ANIM_MAPPING["directions"][d], 4 + ANIM_MAPPING["directions"][d]):
+			for frame in range(animation.ANIM_MAPPING["directions"][d], 4 + animation.ANIM_MAPPING["directions"][d]):
 				frames.append(fighterTiles.get_tile_image(frame, 0, 0).copy())
 
 			self.anim["MOVE"][d] = frames
@@ -156,7 +138,7 @@ class Fighter(pygame.sprite.Sprite):
 				self.centerPoint(),
 				angle + random.randint(-10,10),
 				damage + random.randint(7,10),
-				((255 - random.randint(0, 55)) - damage , 0 + damage, 0 + damage)
+				((255 - random.randint(0, 55)) - damage , damage, damage)
 			)
 		if self.health <= 0:
 			self.world.dead.append(self)

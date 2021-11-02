@@ -1,19 +1,12 @@
 import os
 from pytmx import load_pygame
-
+import animation
 
 APP_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
 fighterTiles = load_pygame(os.path.join(APP_PATH, "tiles", "fighter.tmx"))
 
 
 def loadFrames(name):
-	compassDirections = [
-		"E",
-		"W",
-		"N",
-		"S"
-	]
-
 	anim = {
 		"E": [],
 		"W": [],
@@ -22,24 +15,12 @@ def loadFrames(name):
 	}
 
 	x = 0
-	for d in compassDirections:
+	for d in anim:
 		for frame in range(0, 4):
-			anim[d].append(fighterTiles.get_tile_image(x, SPRITE_ROW_MAPPING[name], 0))
+			anim[d].append(fighterTiles.get_tile_image(x, animation.ANIM_MAPPING["equipment"][name], 0))
 			x += 1
-
 	return(anim)
 
-
-SPRITE_ROW_MAPPING = {
-	"body": 0,
-	"sword": 1,
-	"shield": 2,
-	"shirt": 3,
-	"pants": 4,
-	"hair": 5,
-	"shoes": 6,
-	"fist": 7,
-}
 
 
 class Sword:
@@ -104,28 +85,28 @@ class Shield:
 
 
 class Shirt:
-	def __init__(self, color=(255,0,255)):
+	def __init__(self):
 		self.name = "shirt"
 		self.category = "clothing"
 		self.anim = loadFrames(self.name)
 
 
 class Pants:
-	def __init__(self, color=(255,0,255)):
+	def __init__(self):
 		self.name = "pants"
 		self.category = "clothing"
 		self.anim = loadFrames(self.name)
 
 
 class Hair:
-	def __init__(self, color=(255,0,255)):
+	def __init__(self):
 		self.name = "hair"
 		self.category = "clothing"
 		self.anim = loadFrames(self.name)
 
 
 class Shoes:
-	def __init__(self, color=(255,0,255)):
+	def __init__(self):
 		self.name = "shoes"
 		self.category = "clothing"
 		self.anim = loadFrames(self.name)
