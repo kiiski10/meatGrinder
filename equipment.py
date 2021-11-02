@@ -3,7 +3,7 @@ from pytmx import load_pygame
 import animation
 
 APP_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
-fighterTiles = load_pygame(os.path.join(APP_PATH, "tiles", "fighter.tmx"))
+fighterTiles = load_pygame(os.path.join(APP_PATH, "tiles", "fighter", "fighter.tmx"))
 
 
 def loadFrames(name):
