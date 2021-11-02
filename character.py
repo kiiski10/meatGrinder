@@ -31,14 +31,11 @@ class Fighter(pygame.sprite.Sprite):
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
 		self.equipment = {}
 
-		print("equip")
 		for e in selectedEquipment:
 			if e.category == "armor":
-				print("	armor:", e)
 				self.equipment["armor"] = e
 
 			elif e.category == "weapon":
-				print("	weapon:", e)
 				self.equipment["weapon"] = e
 
 			else:
@@ -46,7 +43,6 @@ class Fighter(pygame.sprite.Sprite):
 					self.equipment[e.category] = [e]
 				else:
 					self.equipment[e.category].append(e)
-				print("	", e.category, e)
 
 		self.anim = {
 			"MOVE": {
@@ -67,25 +63,23 @@ class Fighter(pygame.sprite.Sprite):
 		# generate anim frames
 		for d in animation.ANIM_MAPPING["directions"]:
 			frames = []
+			fn = 0
 			for frame in range(animation.ANIM_MAPPING["directions"][d], 4 + animation.ANIM_MAPPING["directions"][d]):
-				frames.append(fighterTiles.get_tile_image(frame, 0, 0).copy())
+				newFrame = fighterTiles.get_tile_image(frame, 0, 0).copy()
+				for c in self.equipment:
+					if c == "clothing":
+						for i in self.equipment[c]:
+							newFrame.blit(i.anim[d][fn], [0, 0])
+					if c == "weapon":
+						newFrame.blit(self.equipment[c].anim[d][fn], [0, 0])
+					if c == "armor":
+						newFrame.blit(self.equipment[c].anim[d][fn], [0, 0])
+				newFrame = utilities.changeColor(newFrame, self.team["color"])
+				frames.append(newFrame)
+				fn += 1
 
 			self.anim["MOVE"][d] = frames
 
-			sprite = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-			sprite.set_colorkey((255,0,255))
-			sprite.fill((255,0,255, 0))
-			for f in range(0, 4):
-				if "clothing" in self.equipment:
-					for e in self.equipment["clothing"]:
-						sprite.blit(e.anim[d][f], [0, 0])
-				if "armor" in self.equipment:
-					sprite.blit(e.anim[d][f], [0, 0])
-				if "weapon" in self.equipment:
-					sprite.blit(e.anim[d][f], [0, 0])
-
-				self.anim["MOVE"][d][f].blit(utilities.changeColor(sprite, self.team["color"]), [0, 0])
-				sprite.fill((255,0,255, 0))
 
 
 	def centerPoint(self):
@@ -146,11 +140,11 @@ class Fighter(pygame.sprite.Sprite):
 		if self.health <= 0:
 			self.world.dead.append(self)
 			skeletonColors = [(155,155,105),(55,55,55)]
-			for i in range(2):
-				tint_color = skeletonColors[i-1]
-				bones = self.image.copy()
-				bones.fill((0, 0, 0, 175), None, pygame.BLEND_RGBA_MULT)
-				bones.fill(tint_color[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
+			i = 0
+			for sColor in skeletonColors:
+				i += 1
+				tintColor = sColor
+				bones = utilities.tintImage(self.image, sColor)
 				self.world.bloodNcorpseLayer.blit(
 					bones,
 					(

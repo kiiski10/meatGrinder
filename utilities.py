@@ -38,3 +38,9 @@ def changeColor(image, replaceWith):
 	pa = pygame.PixelArray(image)
 	pa.replace(toReplace, replaceWith)
 	return(pa.make_surface())
+
+def tintImage(destImg, tintColor):
+	tinted = destImg.copy()
+	tinted.fill((0, 0, 0, 175), None, pygame.BLEND_RGBA_MULT)
+	tinted.fill(tintColor[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
+	return(tinted)

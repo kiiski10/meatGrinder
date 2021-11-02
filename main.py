@@ -59,7 +59,7 @@ def handleEvents():
 
 def randomEquipments(n):
 	equipmentAvailable = [Sword(), Shield(), Shirt(), Pants(), Hair(), Shoes()]
-	selectedEquipment = [Skin(), Fist(), Shoes()]
+	selectedEquipment = [Skin(), Fist()]
 	while len(selectedEquipment) < n:
 		e = random.choice(equipmentAvailable)
 		if e not in selectedEquipment:
