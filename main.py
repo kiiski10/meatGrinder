@@ -1,6 +1,6 @@
 import time, random, pygame
 
-TARGET_FPS = 30
+TARGET_FPS = 2
 WINDOW_SIZE = [900, 500]
 START_PLAYER_COUNT = 10
 
@@ -18,9 +18,9 @@ fighterInputs =	{
 }
 
 teams = {
-	"yellow": {
-		"name": "yellow",
-		"color": (255, 187, 20),
+	"orange": {
+		"name": "orange",
+		"color": (255, 87, 20),
 		"fighterInputs": [fighterInputs["A"]],
 		"primaryTarget": fighterInputs["B"]
 	},
@@ -59,7 +59,7 @@ def handleEvents():
 
 def randomEquipments(n):
 	equipmentAvailable = [Sword(), Shield(), Shirt(), Pants(), Hair(), Shoes()]
-	selectedEquipment = [Skin(), Fist()]
+	selectedEquipment = [Skin(), Fist(), Shoes()]
 	while len(selectedEquipment) < n:
 		e = random.choice(equipmentAvailable)
 		if e not in selectedEquipment:
@@ -75,7 +75,7 @@ for i in range(START_PLAYER_COUNT):
 	c += 1
 	if c > 1:
 		c = 0
-		team = "yellow"
+		team = "orange"
 	else:
 		team = "blue"
 	speed = random.randint(20, 60) / 10

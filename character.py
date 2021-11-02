@@ -31,13 +31,14 @@ class Fighter(pygame.sprite.Sprite):
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
 		self.equipment = {}
 
-		usedCategories = []
+		print("equip")
 		for e in selectedEquipment:
-			usedCategories.append(e.category)
 			if e.category == "armor":
+				print("	armor:", e)
 				self.equipment["armor"] = e
 
 			elif e.category == "weapon":
+				print("	weapon:", e)
 				self.equipment["weapon"] = e
 
 			else:
@@ -45,6 +46,7 @@ class Fighter(pygame.sprite.Sprite):
 					self.equipment[e.category] = [e]
 				else:
 					self.equipment[e.category].append(e)
+				print("	", e.category, e)
 
 		self.anim = {
 			"MOVE": {
@@ -77,13 +79,13 @@ class Fighter(pygame.sprite.Sprite):
 				if "clothing" in self.equipment:
 					for e in self.equipment["clothing"]:
 						sprite.blit(e.anim[d][f], [0, 0])
-				elif "armor" in self.equipment:
+				if "armor" in self.equipment:
 					sprite.blit(e.anim[d][f], [0, 0])
-				elif "weapon" in self.equipment:
+				if "weapon" in self.equipment:
 					sprite.blit(e.anim[d][f], [0, 0])
 
-				colored = utilities.changeColor(sprite, self.team["color"])
-				self.anim["MOVE"][d][f].blit(utilities.changeColor(colored, self.team["color"]), [0, 0])
+				self.anim["MOVE"][d][f].blit(utilities.changeColor(sprite, self.team["color"]), [0, 0])
+				sprite.fill((255,0,255, 0))
 
 
 	def centerPoint(self):
@@ -115,6 +117,7 @@ class Fighter(pygame.sprite.Sprite):
 			return(enemyRects[index])
 		else:
 			return(pygame.Rect(self.team["primaryTarget"], (20, 20)))
+
 
 	def move(self):
 		# change animation frame
