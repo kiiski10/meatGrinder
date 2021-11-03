@@ -4,7 +4,7 @@ import utilities
 class Grinder:
 	def __init__(self, teams, inputs):
 		print("grinder init")
-		self.surface = pygame.Surface((1000, 600))
+		self.surface = pygame.Surface((1200, 500))
 		self.debugLayer = pygame.Surface(self.surface.get_rect().size)
 		self.debugLayer.set_colorkey((255, 0, 255))
 		self.bloodNcorpseLayer = pygame.Surface(self.surface.get_rect().size)
@@ -44,8 +44,8 @@ class Grinder:
 
 
 	def addBloodDrop(self, pos, dir, damage, color):
-		if len(self.bloodDrops) > 500:
-			draw = not random.randint(0, 2)
+		if len(self.bloodDrops) > 1000:
+			draw = not random.randint(0, 70)
 		else:
 			draw = True
 
