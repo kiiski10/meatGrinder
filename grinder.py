@@ -27,6 +27,7 @@ class Grinder:
 			"step": 0
 		}
 
+
 	def step(self):
 		self.stats["step"] += 1
 
@@ -113,8 +114,10 @@ class Grinder:
 			[0, 0]
 		)
 
+
 	def listEnemies(self, team):
 		return(list(filter(lambda x: x.team["name"] != team, self.fighters)))
+
 
 	def render(self):
 		self.drawBlood()
