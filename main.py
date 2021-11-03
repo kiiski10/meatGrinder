@@ -22,8 +22,8 @@ from character import Fighter
 time.sleep(0)
 
 fighterInputs =	{
-	"A": [1190, 250],
-	"B": [10, 250]
+	"A": [1180, 240],
+	"B": [10, 240]
 }
 
 teams = {
@@ -79,7 +79,7 @@ def randomEquipments(n):
 			selectedEquipment.append(e)
 
 	return(selectedEquipment)
-	
+
 
 pygame.event.get()
 running = True

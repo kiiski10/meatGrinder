@@ -12,7 +12,7 @@ class Fighter(pygame.sprite.Sprite):
 		):
 
 		pygame.sprite.Sprite.__init__(self)
-		self.image = fighterTiles.get_tile_image(0, 0, 0).copy() # set naked body sprite as base image
+		self.image = fighterTiles.get_tile_image(4, 0, 0).copy() # set naked body sprite as base image
 		self.world = world
 		self.rect = self.image.get_rect()
 		self.rect.center = team["fighterInputs"][spawnNr],

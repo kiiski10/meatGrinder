@@ -44,3 +44,10 @@ def tintImage(destImg, tintColor):
 	tinted.fill((0, 0, 0, 175), None, pygame.BLEND_RGBA_MULT)
 	tinted.fill(tintColor[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
 	return(tinted)
+
+def screenPosToTilePos(tileSize, pos):
+	x = pos[0] / tileSize
+	y = pos[0] / tileSize
+
+	print("screen pos to tile {} -> {}x{}".format(pos, x,y))
+	return(x, y)
