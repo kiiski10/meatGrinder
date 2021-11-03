@@ -10,7 +10,7 @@ FULLSCREEN = False
 if FULLSCREEN:
 	displaySurf = pygame.display.set_mode((0, 0), pygame.NOFRAME)
 else:
-	displaySurf = pygame.display.set_mode(WINDOW_SIZE)# | pygame.FULLSCREEN)
+	displaySurf = pygame.display.set_mode(WINDOW_SIZE)
 
 pygame.display.init()
 
@@ -22,8 +22,8 @@ from character import Fighter
 time.sleep(0)
 
 fighterInputs =	{
-	"A": [1190, 200],
-	"B": [(displaySurf.get_height() - WINDOW_SIZE[1]) / 2, 300]
+	"A": [1190, 250],
+	"B": [10, 250]
 }
 
 teams = {
@@ -43,7 +43,8 @@ teams = {
 
 clock = pygame.time.Clock()
 meatGrinder = Grinder(teams, fighterInputs)
-factory = Factory(teams["orange"])
+factory = Factory(teams["orange"], meatGrinder)
+
 
 def addFighter(team, spawn, speed, equipment):
 	meatGrinder.fighters.append(Fighter(
@@ -54,6 +55,7 @@ def addFighter(team, spawn, speed, equipment):
 		selectedEquipment=equipment
 	)
 )
+
 
 def handleEvents():
 	events = pygame.event.get()
@@ -67,6 +69,7 @@ def handleEvents():
 				return(False)
 	return(True)
 
+
 def randomEquipments(n):
 	equipmentAvailable = [Sword(), Shield(), Shirt(), Pants(), Hair(), Shoes()]
 	selectedEquipment = [Skin(), Fist()]
@@ -76,6 +79,7 @@ def randomEquipments(n):
 			selectedEquipment.append(e)
 
 	return(selectedEquipment)
+	
 
 pygame.event.get()
 running = True
@@ -99,14 +103,19 @@ while running:
 	stepPerSecCounter += 1
 	running = handleEvents()
 	displaySurf.fill((120, 120, 120))
-	meatGrinder.debugLayer.fill((255, 0, 255))
+	#meatGrinder.debugLayer.fill((255, 0, 255))
 	meatGrinder.step()
+	factory.step()
 	meatGrinder.render()
 	factory.render()
+
 	surfaceYPos = (displaySurf.get_height() - meatGrinder.surface.get_height()) / 2
-	surfaceXPos = meatGrinder.surface.get_width() + 20
+	surfaceXPos = meatGrinder.surface.get_width() + 10
+
 	displaySurf.blit(meatGrinder.surface, (5, surfaceYPos))
+	#displaySurf.blit(meatGrinder.debugLayer, (5, surfaceYPos))
 	displaySurf.blit(factory.surface, (surfaceXPos, surfaceYPos))
+
 	pygame.display.flip()
 
 	spawnTime = not random.randint(0, 10)

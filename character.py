@@ -16,8 +16,8 @@ class Fighter(pygame.sprite.Sprite):
 		self.world = world
 		self.rect = self.image.get_rect()
 		self.rect.center = team["fighterInputs"][spawnNr],
-		self.rect.x += random.randint(-48, 24)
-		self.rect.y = random.randint(-48, 500)
+		# self.rect.x += random.randint(-48, 48)
+		# self.rect.y = random.randint(-48, 48)
 		self.enemyDetectionAreaSize = 350
 		self.dir = 45
 		self.speed = speed + random.randint(10, 30) / 10
@@ -54,7 +54,7 @@ class Fighter(pygame.sprite.Sprite):
 		}
 
 		self.timeStamps = {
-			"hit": random.randint(0, self.equipment["weapon"].weight),
+			"hit": 0,
 			"stun": 0,
 			"move": 0,
 			"search": 0,
