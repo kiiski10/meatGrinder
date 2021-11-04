@@ -2,6 +2,7 @@ import pygame, random, os
 from pytmx import load_pygame
 from productionLine import ProductionLine
 from character import Fighter
+import utilities
 
 APP_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
 
@@ -9,16 +10,13 @@ APP_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
 class Factory:
 	def __init__(self, team, grinder):
 		print("factory init")
+		self.fighterSprites = pygame.sprite.Group()
 		self.team = team
 		self.stats = {
 			"step": 0
 		}
 		self.grinder = grinder
 		self.fighters = []
-		self.fighterQueue = {
-			"pos": [0, 9],
-			"fighters": []
-		}
 		self.tileMap = load_pygame(os.path.join(APP_PATH, "tiles", "factory", "factory.tmx"))
 		self.surface = pygame.Surface((480, 480))
 		_surfsize = self.surface.get_rect().size
@@ -30,7 +28,8 @@ class Factory:
 		self.lineSurface.set_colorkey((255, 0, 255))
 		self.machineSurface.set_colorkey((255, 0, 255))
 		self.fighterSurface.set_colorkey((255, 0, 255))
-		self.prodLine = ProductionLine()
+		self.inGate = self.getTilesBylayer("fighterIn")[0]
+		self.prodLine = ProductionLine(self, self.inGate)
 
 	def getTilesBylayer(self, layerName):
 		tileCoords = []
@@ -45,9 +44,9 @@ class Factory:
 		self.prodLine.step()
 
 		if not random.randint(0, 20):
-			pos = [9, 0]
-			if self.prodLine.hasRoom(pos, inPixelFormat=False):
-				#print("add fighter #{} at frame {}".format(len(self.fighters) +1, self.stats["step"]))
+			pos = self.inGate
+			if self.prodLine.hasRoom(pos):
+				print("add fighter", pos)
 				newFighter = Fighter(
 					world=self.grinder,
 					team=self.team,
@@ -56,9 +55,9 @@ class Factory:
 					selectedEquipment=[]
 				)
 
-				#newFighter.rect.center = [x, y]
-				self.fighterQueue["fighters"].append(newFighter)
-				self.prodLine.line["{:.0f}x{:.0f}".format(pos[0], pos[1])]["fighters"].append(newFighter)
+				newFighter.rect.topleft = utilities.tilePosToScreenPos(48, pos)
+				self.prodLine.line[utilities.tilePosId(pos)].fighters.append(newFighter)
+				self.fighterSprites.add(newFighter)
 
 
 	def drawLayerByName(self, layerName, targetSurface):
@@ -86,13 +85,8 @@ class Factory:
 	def drawFighters(self):
 		self.fighterSurface.fill((255, 0 ,255))
 
-		# fighters waiting to get in
-		for f in self.fighterQueue["fighters"]:
-			self.fighterSurface.blit(f.image, f.rect.topleft)
-
 		# fighters on production lines
-		for f in self.fighters:
-			self.fighterSurface.blit(f.image, f.centerPoint)
+		self.fighterSprites.draw(self.fighterSurface)
 
 		pygame.Surface.blit(
 			self.surface,

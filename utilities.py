@@ -47,7 +47,15 @@ def tintImage(destImg, tintColor):
 
 def screenPosToTilePos(tileSize, pos):
 	x = pos[0] / tileSize
-	y = pos[0] / tileSize
-
-	print("screen pos to tile {} -> {}x{}".format(pos, x,y))
+	y = pos[1] / tileSize
+	# print("screen pos to tile {} -> {}x{}".format(pos, x,y))
 	return(x, y)
+
+def tilePosToScreenPos(tileSize, pos):
+	x = pos[0] * tileSize
+	y = pos[1] * tileSize
+	# print("tile pos to pixels {} -> {}x{}".format(pos, x,y))
+	return(x, y)
+
+def tilePosId(pos):
+	return("{:.0f}x{:.0f}".format(pos[0], pos[1]))
