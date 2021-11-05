@@ -45,7 +45,7 @@ class Factory:
 		if not random.randint(0, 20):
 			pos = self.inGate
 			if self.prodLine.hasRoom(pos):
-				print("add fighter", pos)
+				print("add fighter to factory tile", pos)
 				newFighter = Fighter(
 					world=self.grinder,
 					team=self.team,

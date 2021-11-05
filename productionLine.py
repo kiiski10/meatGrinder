@@ -32,31 +32,36 @@ class ProductionLine:
 
 		for s in self.factory.getTilesByLayer("prodLine"):
 			newSection = Section(s)
-			# TODO: check neighbouring tiles and add connections
+			self.line[utilities.tilePosId(s)] = newSection
+
+
+		for section in self.line:
+			pos = self.line[section].tilePos
+			posString = "{}x{}".format(pos[0], pos[1])
+			#print("section", pos[0], pos[1])
+			# check neighbouring line sections and add connections
 			for x, y in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
-				xx = s[0] + x
-				yy = s[1] + y
-				if self.hasRoom([xx, yy]):
-					newSection.connections.append([xx, yy])
+				xx = self.line[posString].tilePos[0] + x
+				yy = self.line[posString].tilePos[1] + y
+				hasroom = self.hasRoom([xx, yy])
+				if hasroom:
+					#print("  has connection to: {}x{}".format(xx, yy))
+					self.line[posString].connections.append([xx, yy])
+
 					pygame.draw.line(
 						self.debugLayer,
 						[42, 132, 245],
-						utilities.tilePosToScreenPos(48, s),
+						utilities.tilePosToScreenPos(48, self.line[posString].tilePos),
 						utilities.tilePosToScreenPos(48, [xx, yy]),
 						5
 					)
-					#print("add connection {}-> {}x{}".format(s, xx, yy))
-
-			if newSection.connections:
-				print("connections", s, "->", newSection.connections)
-			self.line[utilities.tilePosId(s)] = newSection
 
 
 	def hasRoom(self, pos):
 		posString = utilities.tilePosId(pos)
 
 		if posString in self.line:
-			if len(self.line[posString].fighters) < 2:
+			if len(self.line[posString].fighters) < 1:
 				#print("part of line has room", posString)
 				return(True)
 		# 	else:

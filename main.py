@@ -5,7 +5,8 @@ START_PLAYER_COUNT = 2
 WINDOW_SIZE = [1700, 600]
 #FULLSCREEN = True
 FULLSCREEN = False
-DEBUG = True
+#DEBUG = True
+DEBUG = False
 
 if FULLSCREEN:
 	displaySurf = pygame.display.set_mode((0, 0), pygame.NOFRAME)
