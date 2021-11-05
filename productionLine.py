@@ -33,31 +33,33 @@ class ProductionLine:
 			newSection = Section(s)
 			self.line[utilities.tilePosId(s)] = newSection
 
+		# add connections
 		for section in self.line:
 			pos = self.line[section].tilePos
-			posString = "{}x{}".format(pos[0], pos[1])
+			#print("section in", pos)
+			for n in self.neighboringSections(pos):
+				posString = utilities.tilePosId(n.tilePos)
 
-			# add connections
-			for x, y in self.neighboringSections(pos):
-				if self.isNextToLine([x, y]):
-					print("  is connected to: {}x{}".format(x, y))
-					self.line[posString].connections.append([x, y])
-
-					pygame.draw.line(
-						self.debugLayer,
-						[42, 132, 245],
-						utilities.tilePosToScreenPos(48, self.line[posString].tilePos),
-						utilities.tilePosToScreenPos(48, [x, y]),
-						5
-					)
+				pygame.draw.line(
+					self.debugLayer,
+					[242, 132, 45],
+					utilities.tilePosToScreenPos(48, pos),
+					utilities.tilePosToScreenPos(48, n.tilePos),
+					5
+				)
 
 
 	def neighboringSections(self, pos):
 		neighbors = []
 		posString = utilities.tilePosId(pos)
-		for x, y in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
-			xx = self.line[posString].tilePos[0] + x
-			yy = self.line[posString].tilePos[1] + y
+		if posString in self.line:
+			for x, y in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
+				testKey = utilities.tilePosId((pos[0] + x, pos[1] + y))
+				if testKey in self.line:
+					n = self.line[testKey]
+					neighbors.append(n)
+
+		#print("  is connected to", len(neighbors))
 		return(neighbors)
 
 
