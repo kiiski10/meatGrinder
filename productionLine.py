@@ -9,7 +9,7 @@ class Section:
 		#self.image = img
 		self.tilePos = pos
 		self.machine = None
-		self.connections = []
+		self.neighbors = []
 
 
 class ProductionLine:
@@ -38,7 +38,8 @@ class ProductionLine:
 			pos = self.line[section].tilePos
 			#print("section in", pos)
 			for n in self.neighboringSections(pos):
-				posString = utilities.tilePosId(n.tilePos)
+				n.neighbors.append(self.line[section])
+				self.line[section].neighbors.append(n)
 
 				pygame.draw.line(
 					self.debugLayer,
@@ -47,6 +48,16 @@ class ProductionLine:
 					utilities.tilePosToScreenPos(48, n.tilePos),
 					5
 				)
+
+
+	def availableDirections(self, fromPos):
+		destSections = []
+		if not fromPos in self.line:
+			return(None)
+
+		destSections += self.line[fromPos].neighbors
+		#print("destinations from", fromPos, len(destSections))
+		return(destSections)
 
 
 	def neighboringSections(self, pos):
@@ -64,7 +75,10 @@ class ProductionLine:
 
 
 	def addFighter(self, newFighter):
-		print("add fighter to factory tile", utilities.screenPosToTilePos(48, newFighter.rect.center))
+		tilePos = utilities.screenPosToTilePos(48, newFighter.rect.center)
+		posString = utilities.tilePosId(tilePos)
+		newFighter.state = posString
+		print("add fighter to factory tile", tilePos)
 		self.fighters.append(newFighter)
 
 
@@ -77,16 +91,13 @@ class ProductionLine:
 		return(len(occupiers))
 
 
-	def moveFighters(self):
-		for fighter in self.fighters:
-			if fighter.state != "INMACHINE":
-				pass #print(fighter)
-
-		return([])
-
 	def lineAdvance(self):
-		self.moveFighters()
-
+		# move fighters
+		for fighter in self.fighters:
+			for sect in self.availableDirections(fighter.state):
+				if self.fightersAt(sect.tilePos) < 1:
+					fighter.state = utilities.tilePosId(sect.tilePos)
+					fighter.rect.center = utilities.tilePosToScreenPos(48, sect.tilePos)
 
 	def step(self):
 		self.stats["step"] += 1
