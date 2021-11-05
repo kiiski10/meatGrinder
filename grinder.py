@@ -14,7 +14,6 @@ class Grinder:
 		self.bloodDropLayer.set_colorkey((0, 0, 0))
 		self.inputs = inputs # [{"name": "A", "pos": [x, y], "que": []}]
 		self.fighters = []
-		self.dead = []
 		self.teams = teams
 		self.bloodDrops = []
 		self.debug = False

@@ -3,14 +3,13 @@ import utilities
 import animation
 from equipment import *
 
-pygame.font.init()
-font = pygame.font.SysFont('Monotype', 12)
 
 class Fighter(pygame.sprite.Sprite):
 	def __init__(
 			self, speed=1, world=None, selectedEquipment=[], team=None, spawnNr=0
 		):
 
+		self.debug = True
 		pygame.sprite.Sprite.__init__(self)
 		self.image = fighterTiles.get_tile_image(4, 0, 0).copy() # set naked body sprite as base image
 		self.world = world
@@ -28,6 +27,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.target = None
 		self.frame = 0
 		self.animFrame = 0
+		self.advAnim = True
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
 		self.equipment = {}
 
@@ -81,7 +81,6 @@ class Fighter(pygame.sprite.Sprite):
 			self.anim["MOVE"][d] = frames
 
 
-
 	def centerPoint(self):
 		return [
 			int(self.rect.center[0] + self.rect.width / 2),
@@ -114,10 +113,6 @@ class Fighter(pygame.sprite.Sprite):
 
 
 	def move(self):
-		# change animation frame
-		self.animFrame += 1
-		if self.animFrame >= len(self.anim[self.state][utilities.dirAsCompassDir(self.dir)]):
-			self.animFrame -= len(self.anim[self.state][utilities.dirAsCompassDir(self.dir)])
 		self.image = self.anim["MOVE"][utilities.dirAsCompassDir(self.dir)][self.animFrame]
 		self.rect.center = utilities.angleDistToPos(self.rect.center, self.dir, 1.1 * self.speed)
 
@@ -138,7 +133,6 @@ class Fighter(pygame.sprite.Sprite):
 				((255 - random.randint(0, 55)) - damage , damage, damage)
 			)
 		if self.health <= 0:
-			self.world.dead.append(self)
 			skeletonColors = [(155,155,105),(55,55,55)]
 			i = 0
 			for sColor in skeletonColors:
@@ -187,48 +181,19 @@ class Fighter(pygame.sprite.Sprite):
 
 	def step(self, frame):
 		self.frame = frame
+
+		# change animation frame on every other step
+		self.advAnim = not self.advAnim
+		if self.advAnim:
+			self.animFrame += 1
+			if self.animFrame >= len(self.anim["MOVE"][utilities.dirAsCompassDir(self.dir)]):
+				self.animFrame -= len(self.anim["MOVE"][utilities.dirAsCompassDir(self.dir)])
+
+		if self.debug:
+			utilities.drawDebugLayer(self)
+
 		if self.frame - self.timeStamps["search"] > self.searchInterval:
 			self.state = "SEARCH"
-
-		debug = True
-		if debug and self.target: # target line
-			pygame.draw.line(
-				self.world.debugLayer,
-				(20, 10, 40),
-				(self.rect.center[0] + 24, self.rect.center[1] + 24),
-				(self.target.center[0] + 24, self.target.center[1] + 24),
-				1
-		)
-
-		debug = True
-		if debug: # hit marker
-			if self.lastHitArea:
-				pygame.draw.rect(
-					self.world.debugLayer,
-					(200, 30, 30),
-					self.lastHitArea,
-					0
-				)
-				self.lastHitArea = None
-
-		debug = True
-		if debug: # health bar
-			x = self.rect.x + self.rect.width * 0.5
-			y = self.rect.y + self.rect.height * 1.5
-
-			pygame.draw.line(
-				self.world.debugLayer,
-				(20, 130, 30),
-				(x,y), (x + (self.health / 100) * self.rect.width, y),
-				3
-		)
-
-		debug = True
-		if debug: # state
-			textsurface = font.render(self.state, False, (0, 0, 0))
-			x = self.rect.x + self.rect.width * 0.5
-			y = self.rect.y + self.rect.height * 1.5
-			self.world.debugLayer.blit(textsurface,(x,y))
 
 		if self.state == "SEARCH":
 			self.target = self.findTarget()
@@ -265,9 +230,6 @@ class Fighter(pygame.sprite.Sprite):
 					self.dir = angle - 180
 					if angle < 0:
 						angle += 360
-
-		elif self.state == "DEAD":
-			pass # Cant do much else while dead
 
 		if dist < self.equipment["weapon"].reach:
 			self.state = "INFIGHT"

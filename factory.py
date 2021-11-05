@@ -16,7 +16,6 @@ class Factory:
 			"step": 0
 		}
 		self.grinder = grinder
-		self.fighters = []
 		self.tileMap = load_pygame(os.path.join(APP_PATH, "tiles", "factory", "factory.tmx"))
 		self.surface = pygame.Surface((480, 480))
 		_surfsize = self.surface.get_rect().size
@@ -28,10 +27,10 @@ class Factory:
 		self.lineSurface.set_colorkey((255, 0, 255))
 		self.machineSurface.set_colorkey((255, 0, 255))
 		self.fighterSurface.set_colorkey((255, 0, 255))
-		self.inGate = self.getTilesBylayer("fighterIn")[0]
+		self.inGate = self.getTilesByLayer("fighterIn")[0]
 		self.prodLine = ProductionLine(self, self.inGate)
 
-	def getTilesBylayer(self, layerName):
+	def getTilesByLayer(self, layerName):
 		tileCoords = []
 		for x, y, gid, in self.tileMap.get_layer_by_name(layerName):
 			if gid:
@@ -55,7 +54,7 @@ class Factory:
 					selectedEquipment=[]
 				)
 
-				newFighter.rect.topleft = utilities.tilePosToScreenPos(48, pos)
+				newFighter.rect.center = utilities.tilePosToScreenPos(48, pos)
 				self.prodLine.line[utilities.tilePosId(pos)].fighters.append(newFighter)
 				self.fighterSprites.add(newFighter)
 
@@ -96,7 +95,15 @@ class Factory:
 
 
 	def render(self):
-		self.drawLayerByName("lines", self.lineSurface)
+		self.drawLayerByName("prodLine", self.lineSurface)
 		self.drawLayerByName("machines", self.machineSurface)
 		self.drawLayerByName("arrows", self.arrowSurface)
+		self.drawLayerByName("fighterIn", self.fighterSurface)
+		self.drawLayerByName("fighterOut", self.fighterSurface)
 		self.drawFighters()
+
+		pygame.Surface.blit(
+			self.surface,
+			self.prodLine.debugLayer,
+			[0, 0]
+		)

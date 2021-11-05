@@ -2,10 +2,10 @@ import time, random, pygame
 TARGET_FPS = 30
 START_PLAYER_COUNT = 2
 
-WINDOW_SIZE = [1900, 792]
+WINDOW_SIZE = [1700, 600]
 #FULLSCREEN = True
 FULLSCREEN = False
-
+DEBUG = True
 
 if FULLSCREEN:
 	displaySurf = pygame.display.set_mode((0, 0), pygame.NOFRAME)
@@ -103,7 +103,7 @@ while running:
 	stepPerSecCounter += 1
 	running = handleEvents()
 	displaySurf.fill((120, 120, 120))
-	#meatGrinder.debugLayer.fill((255, 0, 255))
+	if DEBUG: meatGrinder.debugLayer.fill((255, 0, 255))
 	meatGrinder.step()
 	factory.step()
 	meatGrinder.render()
@@ -113,7 +113,7 @@ while running:
 	surfaceXPos = meatGrinder.surface.get_width() + 10
 
 	displaySurf.blit(meatGrinder.surface, (5, surfaceYPos))
-	#displaySurf.blit(meatGrinder.debugLayer, (5, surfaceYPos))
+	if DEBUG: displaySurf.blit(meatGrinder.debugLayer, (5, surfaceYPos))
 	displaySurf.blit(factory.surface, (surfaceXPos, surfaceYPos))
 
 	pygame.display.flip()

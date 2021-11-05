@@ -3,7 +3,7 @@
  <tileset firstgid="1" name="factory" tilewidth="48" tileheight="48" tilecount="48" columns="6">
   <image source="factory.png" width="288" height="400"/>
  </tileset>
- <layer id="1" name="lines" width="10" height="10">
+ <layer id="1" name="prodLine" width="10" height="10">
   <data encoding="csv">
 14,14,14,3,0,0,0,0,1,2,
 0,0,0,9,0,0,0,0,7,0,
