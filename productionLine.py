@@ -10,13 +10,12 @@ class Section:
 		self.tilePos = pos
 		self.machine = None
 		self.connections = []
-		self.fighters = []
 
 
 class ProductionLine:
 	def __init__(self, factory, inGate):
 		print("production line init")
-
+		self.fighters = []
 		self.inGate = inGate
 		self.factory = factory
 		self.debugLayer = pygame.Surface(self.factory.surface.get_rect().size)
@@ -34,43 +33,59 @@ class ProductionLine:
 			newSection = Section(s)
 			self.line[utilities.tilePosId(s)] = newSection
 
-
 		for section in self.line:
 			pos = self.line[section].tilePos
 			posString = "{}x{}".format(pos[0], pos[1])
-			#print("section", pos[0], pos[1])
-			# check neighbouring line sections and add connections
-			for x, y in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
-				xx = self.line[posString].tilePos[0] + x
-				yy = self.line[posString].tilePos[1] + y
-				hasroom = self.hasRoom([xx, yy])
-				if hasroom:
-					#print("  has connection to: {}x{}".format(xx, yy))
-					self.line[posString].connections.append([xx, yy])
+
+			# add connections
+			for x, y in self.neighboringSections(pos):
+				if self.isNextToLine([x, y]):
+					print("  is connected to: {}x{}".format(x, y))
+					self.line[posString].connections.append([x, y])
 
 					pygame.draw.line(
 						self.debugLayer,
 						[42, 132, 245],
 						utilities.tilePosToScreenPos(48, self.line[posString].tilePos),
-						utilities.tilePosToScreenPos(48, [xx, yy]),
+						utilities.tilePosToScreenPos(48, [x, y]),
 						5
 					)
 
 
-	def hasRoom(self, pos):
+	def neighboringSections(self, pos):
+		neighbors = []
 		posString = utilities.tilePosId(pos)
+		for x, y in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
+			xx = self.line[posString].tilePos[0] + x
+			yy = self.line[posString].tilePos[1] + y
+		return(neighbors)
 
-		if posString in self.line:
-			if len(self.line[posString].fighters) < 1:
-				#print("part of line has room", posString)
-				return(True)
-		# 	else:
-		# 		print("part of line is full")
-		# else:
-		# 	print("part of line not found", posString)
 
-		return(False)
+	def addFighter(self, newFighter):
+		print("add fighter to factory tile", utilities.screenPosToTilePos(48, newFighter.rect.center))
+		self.fighters.append(newFighter)
+
+
+	def fightersAt(self, pos):
+		posString = utilities.tilePosId(pos)
+		occupiers = []
+		for f in self.fighters:
+			if utilities.screenPosToTilePos(48, f.rect.center) == pos:
+				occupiers.append(f)
+		return(len(occupiers))
+
+
+	def moveFighters(self):
+		for fighter in self.fighters:
+			if fighter.state != "INMACHINE":
+				pass #print(fighter)
+
+		return([])
+
+	def lineAdvance(self):
+		self.moveFighters()
 
 
 	def step(self):
 		self.stats["step"] += 1
+		self.lineAdvance()

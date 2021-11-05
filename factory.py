@@ -44,8 +44,7 @@ class Factory:
 
 		if not random.randint(0, 20):
 			pos = self.inGate
-			if self.prodLine.hasRoom(pos):
-				print("add fighter to factory tile", pos)
+			if self.prodLine.fightersAt(pos) < 1:
 				newFighter = Fighter(
 					world=self.grinder,
 					team=self.team,
@@ -55,7 +54,7 @@ class Factory:
 				)
 
 				newFighter.rect.center = utilities.tilePosToScreenPos(48, pos)
-				self.prodLine.line[utilities.tilePosId(pos)].fighters.append(newFighter)
+				self.prodLine.addFighter(newFighter)
 				self.fighterSprites.add(newFighter)
 
 
