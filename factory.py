@@ -23,6 +23,10 @@ class Factory:
 		self.lineSurface = pygame.Surface(_surfsize)
 		self.machineSurface = pygame.Surface(_surfsize)
 		self.fighterSurface = pygame.Surface(_surfsize)
+		self.arrowSurface.fill((255, 255, 255))
+		self.lineSurface.fill((255, 255, 255))
+		self.machineSurface.fill((255, 255, 255))
+		self.fighterSurface.fill((255, 255, 255))
 		self.arrowSurface.set_colorkey((255, 0, 255))
 		self.lineSurface.set_colorkey((255, 0, 255))
 		self.machineSurface.set_colorkey((255, 0, 255))
@@ -77,32 +81,19 @@ class Factory:
 			[0, 0]
 		)
 
-		targetSurface.fill((255, 0 ,255))
 
-
-	def drawFighters(self):
-		self.fighterSurface.fill((255, 0 ,255))
-
-		# fighters on production lines
-		self.fighterSprites.draw(self.fighterSurface)
+	def render(self):
+		self.surface.fill((0, 0, 0))
+		self.drawLayerByName("prodLine", self.surface)
+		self.drawLayerByName("machines", self.surface)
+		self.drawLayerByName("fighterIn", self.surface)
+		self.drawLayerByName("fighterOut", self.surface)
+		self.drawLayerByName("arrows", self.surface)
+		self.fighterSurface.fill((255, 0, 255))
+		self.fighterSprites.draw(self.surface)
 
 		pygame.Surface.blit(
 			self.surface,
 			self.fighterSurface,
-			[0, 0]
-		)
-
-
-	def render(self):
-		self.drawLayerByName("prodLine", self.lineSurface)
-		self.drawLayerByName("machines", self.machineSurface)
-		self.drawLayerByName("arrows", self.arrowSurface)
-		self.drawLayerByName("fighterIn", self.fighterSurface)
-		self.drawLayerByName("fighterOut", self.fighterSurface)
-		self.drawFighters()
-
-		pygame.Surface.blit(
-			self.surface,
-			self.prodLine.debugLayer,
 			[0, 0]
 		)
