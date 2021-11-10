@@ -31,6 +31,8 @@ class Fighter(pygame.sprite.Sprite):
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
 		self.equipment = {}
 
+		self.prodLineLastSections = []
+
 		for e in selectedEquipment:
 			if e.category == "armor":
 				self.equipment["armor"] = e

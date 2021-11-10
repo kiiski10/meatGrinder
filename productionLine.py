@@ -76,6 +76,7 @@ class ProductionLine:
 
 	def addFighter(self, newFighter):
 		tilePos = utilities.screenPosToTilePos(48, newFighter.rect.center)
+		newFighter.prodLineLastSections = [tilePos]
 		posString = utilities.tilePosId(tilePos)
 		newFighter.state = posString
 		#print(self.stats["step"], "add fighter to factory tile", tilePos)
@@ -94,17 +95,17 @@ class ProductionLine:
 	def lineAdvance(self):
 		# move fighters
 		for fighter in self.fighters:
-			fighterTilePos = utilities.screenPosToTilePos(48, fighter.rect.center)
 			if self.stats["step"] - fighter.timeStamps["move"] < 10 + random.randint(0, 10):
 				continue
 
 			for sect in self.availableDirections(fighter.state):
-				#print(sect.tilePos, fighterTilePos)
-				if self.fightersAt(sect.tilePos) == 0:
-					fighter.state = utilities.tilePosId(sect.tilePos)
-					fighter.rect.center = utilities.tilePosToScreenPos(48, sect.tilePos)
-					fighter.timeStamps["move"] = self.stats["step"]
-					return()
+				if not sect.tilePos in fighter.prodLineLastSections:
+					if self.fightersAt(sect.tilePos) == 0:
+						fighter.state = utilities.tilePosId(sect.tilePos)
+						fighter.rect.center = utilities.tilePosToScreenPos(48, sect.tilePos)
+						fighter.timeStamps["move"] = self.stats["step"]
+						fighter.prodLineLastSections.append(sect.tilePos)
+						break
 
 	def step(self):
 		self.stats["step"] += 1

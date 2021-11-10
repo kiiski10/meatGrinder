@@ -83,7 +83,7 @@ class Factory:
 
 
 	def render(self):
-		self.surface.fill((0, 0, 0))
+		self.surface.fill((255, 255, 255))
 		self.drawLayerByName("prodLine", self.surface)
 		self.drawLayerByName("machines", self.surface)
 		self.drawLayerByName("fighterIn", self.surface)
