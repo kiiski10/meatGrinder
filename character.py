@@ -6,7 +6,7 @@ from equipment import *
 
 class Fighter(pygame.sprite.Sprite):
 	def __init__(
-			self, speed=1, world=None, selectedEquipment=[], team=None, spawnNr=0
+			self, speed=1, world=None, selectedEquipment=[], team=None, spawnPos=[100, 200]
 		):
 
 		self.debug = True
@@ -14,16 +14,16 @@ class Fighter(pygame.sprite.Sprite):
 		self.image = fighterTiles.get_tile_image(4, 0, 0).copy() # set naked body sprite as base image
 		self.world = world
 		self.rect = self.image.get_rect()
-		self.rect.center = team["fighterInputs"][spawnNr],
+		self.rect.center = spawnPos,
 		# self.rect.x += random.randint(-48, 48)
 		# self.rect.y = random.randint(-48, 48)
-		self.enemyDetectionAreaSize = 350
+		self.enemyDetectionAreaSize = 400
 		self.dir = 45
 		self.speed = speed + random.randint(10, 30) / 10
 		self.state = "IDLE" # IDLE, SEARCH, MOVE, INFIGHT, STUNNED, DEAD
 		self.searchInterval = random.randint(10, 15)
 		self.team = team
-		self.health = 200
+		self.health = 100
 		self.target = None
 		self.frame = 0
 		self.animFrame = 0

@@ -2,6 +2,7 @@ import pygame, random
 from machine import Machine
 import utilities
 from equipment import *
+from character import Fighter
 
 
 class Section:
@@ -17,6 +18,7 @@ class ProductionLine:
 		print("production line init")
 		self.fighters = []
 		self.inGate = inGate
+		self.outGates = [(0,0), (0,9)]
 		self.factory = factory
 		self.debugLayer = pygame.Surface(self.factory.surface.get_rect().size)
 		self.debugLayer.set_colorkey((255, 0, 255))
@@ -89,23 +91,46 @@ class ProductionLine:
 		for f in self.fighters:
 			if utilities.screenPosToTilePos(48, f.rect.center) == pos:
 				occupiers.append(f)
-		return(len(occupiers))
+		return(occupiers)
 
 
 	def lineAdvance(self):
 		# move fighters
+		fightersToGrinder = []
 		for fighter in self.fighters:
 			if self.stats["step"] - fighter.timeStamps["move"] < 10 + random.randint(0, 10):
 				continue
 
+			if fighter.prodLineLastSections[-1] in self.outGates:
+				fightersToGrinder.append(fighter)
+
 			for sect in self.availableDirections(fighter.state):
 				if not sect.tilePos in fighter.prodLineLastSections:
-					if self.fightersAt(sect.tilePos) == 0:
+					if len(self.fightersAt(sect.tilePos)) == 0:
 						fighter.state = utilities.tilePosId(sect.tilePos)
 						fighter.rect.center = utilities.tilePosToScreenPos(48, sect.tilePos)
 						fighter.timeStamps["move"] = self.stats["step"]
 						fighter.prodLineLastSections.append(sect.tilePos)
 						break
+
+		for f in fightersToGrinder:
+			self.fighters.remove(f)
+			fightersToGrinder.remove(f)
+			f.kill()
+			x, y = utilities.tilePosToScreenPos(48, f.prodLineLastSections[-1])
+			x = self.factory.grinder.surface.get_width() - 12
+			y -= 24
+
+			self.factory.grinder.fighters.append(Fighter(
+				world=self.factory.grinder,
+				team=self.factory.team,
+				spawnPos=[x, y],
+				speed=1,
+				selectedEquipment=[Skin(), Fist()]
+			))
+
+
+
 
 	def step(self):
 		self.stats["step"] += 1

@@ -5,8 +5,8 @@ START_PLAYER_COUNT = 2
 WINDOW_SIZE = [1700, 600]
 #FULLSCREEN = True
 FULLSCREEN = False
-DEBUG = True
-#DEBUG = False
+#DEBUG = True
+DEBUG = False
 
 if FULLSCREEN:
 	displaySurf = pygame.display.set_mode((0, 0), pygame.NOFRAME)
@@ -47,11 +47,11 @@ meatGrinder = Grinder(teams, fighterInputs)
 factory = Factory(teams["orange"], meatGrinder)
 
 
-def addFighter(team, spawn, speed, equipment):
+def addFighter(team, spawnPos, speed, equipment):
 	meatGrinder.fighters.append(Fighter(
 		world=meatGrinder,
 		team=teams[team],
-		spawnNr=spawn,
+		spawnPos=spawnPos,
 		speed=speed,
 		selectedEquipment=equipment
 	)
@@ -85,17 +85,6 @@ def randomEquipments(n):
 pygame.event.get()
 running = True
 
-c = 0
-for i in range(START_PLAYER_COUNT):
-	c += 1
-	if c > 1:
-		c = 0
-		team = "orange"
-	else:
-		team = "blue"
-	speed = random.randint(20, 60) / 10
-	addFighter(team, 0, speed, randomEquipments(3))
-
 stepPerSecCounter = 0
 stepPerSecTimer = time.time()
 winTitleExtraText = "FPS:{}/{} | BLOOD:{} | STEP:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops), meatGrinder.stats["step"])
@@ -119,10 +108,11 @@ while running:
 
 	pygame.display.flip()
 
-	spawnTime = not random.randint(0, 10)
+	## spawn enemy fighters
+	spawnTime = not random.randint(0, 45)
 	if spawnTime:
-		speed = random.randint(20, 60) / 10
-		addFighter(random.sample(list(teams), 1)[0], 0, speed, randomEquipments(4))
+		speed = random.randint(10, 40) / 10
+		addFighter("blue", [24, 250], speed, randomEquipments(4))
 
 	if time.time() - stepPerSecTimer >= 1:
 		winTitleExtraText = "FPS:{}/{} | BLOOD:{} | STEP:{}".format(stepPerSecCounter, TARGET_FPS, len(meatGrinder.bloodDrops), meatGrinder.stats["step"])

@@ -34,6 +34,7 @@ class Factory:
 		self.inGate = self.getTilesByLayer("fighterIn")[0]
 		self.prodLine = ProductionLine(self, self.inGate)
 
+
 	def getTilesByLayer(self, layerName):
 		tileCoords = []
 		for x, y, gid, in self.tileMap.get_layer_by_name(layerName):
@@ -48,11 +49,11 @@ class Factory:
 
 		if not random.randint(0, 20):
 			pos = self.inGate
-			if self.prodLine.fightersAt(pos) < 1:
+			if len(self.prodLine.fightersAt(pos)) == 0:
 				newFighter = Fighter(
 					world=self.grinder,
 					team=self.team,
-					spawnNr=0,
+					spawnPos=[0,0],
 					speed=2,
 					selectedEquipment=[]
 				)
