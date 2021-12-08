@@ -4,7 +4,7 @@ import utilities
 class Grinder:
 	def __init__(self, teams, inputs):
 		print("grinder init")
-		self.surface = pygame.Surface((1200, 500))
+		self.surface = pygame.Surface((1200, 480))
 		self.debugLayer = pygame.Surface(self.surface.get_rect().size)
 		self.debugLayer.set_colorkey((255, 0, 255))
 		self.bloodNcorpseLayer = pygame.Surface(self.surface.get_rect().size)
@@ -14,7 +14,6 @@ class Grinder:
 		self.bloodDropLayer.set_colorkey((0, 0, 0))
 		self.inputs = inputs # [{"name": "A", "pos": [x, y], "que": []}]
 		self.fighters = []
-		self.dead = []
 		self.teams = teams
 		self.bloodDrops = []
 		self.debug = False
