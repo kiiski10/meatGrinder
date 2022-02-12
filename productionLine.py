@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, time
 from machine import Machine
 import utilities
 from equipment import *
@@ -6,8 +6,9 @@ from character import Fighter
 
 
 class Section:
-	def __init__(self, pos):
+	def __init__(self, pos, prodLine):
 		#self.image = img
+		self.prodLine = prodLine
 		self.tilePos = pos
 		self.machine = None
 		self.neighbors = []
@@ -28,11 +29,11 @@ class ProductionLine:
 		}
 
 		self.line = {
-			utilities.tilePosId(self.inGate): Section(self.inGate),
+			utilities.tilePosId(self.inGate): Section(self.inGate, self),
 		}
 
 		for s in self.factory.getTilesByLayer("prodLine"):
-			newSection = Section(s)
+			newSection = Section(s, self)
 			self.line[utilities.tilePosId(s)] = newSection
 
 		# add connections
@@ -51,11 +52,17 @@ class ProductionLine:
 					5
 				)
 
+		# add machines to random sections (not on the sides)
+		for s in self.line:
+			if self.line[s].tilePos[0] not in [0, 9] and self.line[s].tilePos[1] not in [0, 9]:
+				if random.randint(0, 100) < 20:
+					self.line[s].machine = Machine(self.line[s])
+
 
 	def availableDirections(self, fromPos):
 		destSections = []
 		if not fromPos in self.line:
-			return(None)
+			return(destSections)
 
 		destSections += self.line[fromPos].neighbors
 		#print("destinations from", fromPos, len(destSections))
@@ -98,6 +105,17 @@ class ProductionLine:
 		# move fighters
 		fightersToGrinder = []
 		for fighter in self.fighters:
+			if fighter.state == "IN_MACHINE":
+				fighterTilePos = utilities.screenPosToTilePos(48, fighter.rect.center)
+				tileId = utilities.tilePosId(fighterTilePos)
+				machine = self.line[tileId].machine
+				print(tileId, time.time() - machine.processStarted, machine.output().tilePos)
+				# move fighter to output if it's not blocked: (should be in machine class)
+				# if len(self.fightersAt(machine.output().tilePos)) < 1:
+				# 	fighter.state = "IDLE"
+				# 	fighter.rect.center = utilities.tilePosToScreenPos(48, machine.output().tilePos)
+				#continue
+
 			if self.stats["step"] - fighter.timeStamps["move"] < 10 + random.randint(0, 10):
 				continue
 
@@ -130,6 +148,10 @@ class ProductionLine:
 			))
 
 
+		# step all machines
+		for s in self.line:
+			if self.line[s].machine:
+				self.line[s].machine.step()
 
 
 	def step(self):

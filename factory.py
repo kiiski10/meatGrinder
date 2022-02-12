@@ -47,6 +47,7 @@ class Factory:
 		self.stats["step"] += 1
 		self.prodLine.step()
 
+		# let fighters in the factory
 		if not random.randint(0, 20):
 			pos = self.inGate
 			if len(self.prodLine.fightersAt(pos)) == 0:
@@ -82,6 +83,22 @@ class Factory:
 			[0, 0]
 		)
 
+
+	def drawMachines(self, targetSurface):
+		machines = []
+		for s in self.line:
+			if self.line[s].machine:
+				machines.append(self.line[s].machine)
+
+		for m in machines:
+			print(m)
+			targetSurface.blit(
+				m.image,
+				(
+					x * self.tileMap.tilewidth,
+					y * self.tileMap.tileheight
+				)
+			)
 
 	def render(self):
 		self.surface.fill((255, 255, 255))

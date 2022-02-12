@@ -20,7 +20,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.enemyDetectionAreaSize = 400
 		self.dir = 45
 		self.speed = speed + random.randint(10, 30) / 10
-		self.state = "IDLE" # IDLE, SEARCH, MOVE, INFIGHT, STUNNED, DEAD
+		self.state = "IDLE" # IDLE, SEARCH, MOVE, INFIGHT, IN_MACHINE, STUNNED, DEAD
 		self.searchInterval = random.randint(10, 15)
 		self.team = team
 		self.health = 100
@@ -30,7 +30,6 @@ class Fighter(pygame.sprite.Sprite):
 		self.advAnim = True
 		self.lastHitArea = pygame.Rect((0,0), (0,0))
 		self.equipment = {}
-
 		self.prodLineLastSections = []
 
 		for e in selectedEquipment:
