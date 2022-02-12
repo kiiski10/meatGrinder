@@ -14,5 +14,8 @@ ANIM_MAPPING = {
 		"hair": 5,
 		"shoes": 6,
 		"fist": 7,
+	},
+	"machine": {
+		"gear": 0,
 	}
 }
