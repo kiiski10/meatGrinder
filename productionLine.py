@@ -113,14 +113,18 @@ class ProductionLine:
 			if fighter.prodLineLastSections[-1] in self.outGates:
 				fightersToGrinder.append(fighter)
 
+			possibilities = []
 			for sect in self.availableDirections(fighter.state):
 				if not sect.tilePos in fighter.prodLineLastSections:
 					if len(self.fightersAt(sect.tilePos)) == 0:
-						fighter.state = utilities.tilePosId(sect.tilePos)
-						fighter.rect.center = utilities.tilePosToScreenPos(48, sect.tilePos)
-						fighter.timeStamps["move"] = self.stats["step"]
-						fighter.prodLineLastSections.append(sect.tilePos)
-						break
+						possibilities.append(sect.tilePos)
+
+			if possibilities:
+				tilePos = random.choice(possibilities)
+				fighter.rect.center = utilities.tilePosToScreenPos(48, tilePos)
+				fighter.timeStamps["move"] = self.stats["step"]
+				fighter.state = utilities.tilePosId(tilePos)
+				fighter.prodLineLastSections.append(tilePos)
 
 		for f in fightersToGrinder:
 			x, y = utilities.tilePosToScreenPos(48, f.prodLineLastSections[-1])
@@ -128,7 +132,7 @@ class ProductionLine:
 			y -= 24
 			f.rect.center = [x, y]
 			selectedEquipment=[Skin(), Fist()]
-			
+
 			for c in f.equipment:
 				selectedEquipment.append(f.equipment[c])
 
