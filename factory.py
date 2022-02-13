@@ -11,6 +11,7 @@ class Factory:
 	def __init__(self, team, grinder):
 		print("factory init")
 		self.fighterSprites = pygame.sprite.Group()
+		self.machineSprites = pygame.sprite.Group()
 		self.team = team
 		self.stats = {
 			"step": 0
@@ -110,6 +111,7 @@ class Factory:
 		self.drawLayerByName("arrows", self.surface)
 		self.fighterSurface.fill((255, 0, 255))
 		self.fighterSprites.draw(self.surface)
+		self.machineSprites.draw(self.surface)
 
 		pygame.Surface.blit(
 			self.surface,

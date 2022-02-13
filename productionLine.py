@@ -7,7 +7,6 @@ from character import Fighter
 
 class Section:
 	def __init__(self, pos, prodLine):
-		#self.image = img
 		self.prodLine = prodLine
 		self.tilePos = pos
 		self.machine = None
@@ -57,6 +56,7 @@ class ProductionLine:
 			if self.line[s].tilePos[0] not in [0, 9] and self.line[s].tilePos[1] not in [0, 9]:
 				if random.randint(0, 100) < 20:
 					self.line[s].machine = Machine(self.line[s])
+					self.factory.machineSprites.add(self.line[s].machine)
 
 
 	def availableDirections(self, fromPos):
