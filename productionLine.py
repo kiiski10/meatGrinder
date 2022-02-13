@@ -55,7 +55,7 @@ class ProductionLine:
 		for s in self.line:
 			if self.line[s].tilePos[0] not in [0, 9] and self.line[s].tilePos[1] not in [0, 9]:
 				if random.randint(0, 100) < 20:
-					self.line[s].machine = Machine(self.line[s])
+					self.line[s].machine = Machine(self.line[s], equipment=random.choice([Sword(), Shield(), Pants(), Shirt()]))
 					self.factory.machineSprites.add(self.line[s].machine)
 
 
@@ -88,7 +88,6 @@ class ProductionLine:
 		newFighter.prodLineLastSections = [tilePos]
 		posString = utilities.tilePosId(tilePos)
 		newFighter.state = posString
-		#print(self.stats["step"], "add fighter to factory tile", tilePos)
 		self.fighters.append(newFighter)
 
 
@@ -124,21 +123,28 @@ class ProductionLine:
 						break
 
 		for f in fightersToGrinder:
-			self.fighters.remove(f)
-			fightersToGrinder.remove(f)
-			f.kill()
 			x, y = utilities.tilePosToScreenPos(48, f.prodLineLastSections[-1])
 			x = self.factory.grinder.surface.get_width() - 12
 			y -= 24
+			f.rect.center = [x, y]
+			selectedEquipment=[Skin(), Fist()]
+			
+			for c in f.equipment:
+				selectedEquipment.append(f.equipment[c])
 
-			self.factory.grinder.fighters.append(Fighter(
+			rebornFighter = Fighter(
 				world=self.factory.grinder,
 				team=self.factory.team,
-				spawnPos=[x, y],
-				speed=1,
-				selectedEquipment=[Skin(), Fist()]
-			))
+				spawnPos=f.rect.center,
+				speed=f.speed,
+				selectedEquipment=selectedEquipment
+			)
 
+			#rebornFighter.equipment = f.equipment
+			self.factory.grinder.fighters.append(rebornFighter)
+			self.fighters.remove(f)
+			fightersToGrinder.remove(f)
+			f.kill()
 
 		# step all machines
 		for s in self.line:

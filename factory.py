@@ -3,6 +3,7 @@ from pytmx import load_pygame
 from productionLine import ProductionLine
 from character import Fighter
 import utilities
+from equipment import *
 
 APP_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
 
@@ -49,8 +50,9 @@ class Factory:
 		self.prodLine.step()
 
 		# let fighters in the factory
-		fightersInFactory = 5
-		if len(self.prodLine.fighters) < fightersInFactory and random.randint(0, 20):
+		maxFightersInFactory = 10
+		chanceToSpawn = 10 # %
+		if len(self.prodLine.fighters) < maxFightersInFactory and random.randint(0, 100) < chanceToSpawn:
 			pos = self.inGate
 			if len(self.prodLine.fightersAt(pos)) == 0:
 				newFighter = Fighter(
@@ -58,7 +60,7 @@ class Factory:
 					team=self.team,
 					spawnPos=[0,0],
 					speed=2,
-					selectedEquipment=[]
+					selectedEquipment=[Skin(), Fist()]
 				)
 
 				newFighter.rect.center = utilities.tilePosToScreenPos(48, pos)

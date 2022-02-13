@@ -1,24 +1,27 @@
-import os, time, pygame
+import os, pygame
 from pytmx import load_pygame
 import utilities
 import animation
+from equipment import *
 
 """
 	TODO:
 	- make better location system for fighters in production lines
-	- load & render sprites for machines properly
 """
 
 APP_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
 machineTiles = load_pygame(os.path.join(APP_PATH, "tiles", "factory", "machines.tmx"))
 
 class Machine(pygame.sprite.Sprite):
-	def __init__(self, mountedOn):
-		print("machine init")
+	def __init__(self, mountedOn, equipment=None):
+		print("machine init @ {}x{} {}".format(mountedOn.tilePos[0], mountedOn.tilePos[1], type(equipment)))
 		pygame.sprite.Sprite.__init__(self)
-		self.image = machineTiles.get_tile_image(0, animation.ANIM_MAPPING["machine"]["gear"], 0)
+		self.image = machineTiles.get_tile_image(0, animation.ANIM_MAPPING["machine"]["gear"], 0).copy()
 		self.rect = self.image.get_rect()
 		self.subject = None
+		self.equipment = equipment
+		self.image.blit(self.equipment.anim["W"][0], [0, 0])
+
 		self.active = True
 		self.state = "WAITING"
 		self.mountedOn = mountedOn # factory lines section instance
@@ -52,6 +55,7 @@ class Machine(pygame.sprite.Sprite):
 				if self.mountedOn.prodLine.stats["step"] - self.processStarted > self.processTime:
 					self.processStarted = False
 					self.state = "OUTPUT"
+					self.subject.equipment[self.equipment.category] = self.equipment
 
 			elif self.state == "OUTPUT":
 				outputQue = self.mountedOn.prodLine.fightersAt(
