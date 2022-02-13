@@ -110,6 +110,9 @@ class ProductionLine:
 			if self.stats["step"] - fighter.timeStamps["move"] < 10 + random.randint(0, 10):
 				continue
 
+			if self.stats["step"] - fighter.timeStamps["move"] > 100:
+				fighter.prodLineLastSections = [utilities.screenPosToTilePos(48, fighter.rect.center)]
+
 			if fighter.prodLineLastSections[-1] in self.outGates:
 				fightersToGrinder.append(fighter)
 
