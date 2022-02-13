@@ -25,7 +25,7 @@ class Machine(pygame.sprite.Sprite):
 		self.rect.center = utilities.tilePosToScreenPos(48, self.mountedOn.tilePos)
 		self.lastInput = None
 		self.level = 1
-		self.processTime = 3
+		self.processTime = 30
 		self.processStarted = False
 
 	def output(self):
@@ -45,23 +45,11 @@ class Machine(pygame.sprite.Sprite):
 					self.subject = fighterQue[0]
 					self.state = "PROCESSING"
 					self.subject.state = "IN_MACHINE"
-					self.processStarted = time.time()
+					self.processStarted = self.mountedOn.prodLine.stats["step"]
 					self.lastInput = self.subject.prodLineLastSections[-2]
-					print("""
-	last sects: {}
-	last input: {}
-	mount point:{}
-	output:     {}
-						""".format(
-							self.subject.prodLineLastSections,
-							self.lastInput,
-							self.mountedOn.tilePos,
-							self.output().tilePos
-						)
-					)
 
 			elif self.state == "PROCESSING":
-				if time.time() - self.processStarted > self.processTime:
+				if self.mountedOn.prodLine.stats["step"] - self.processStarted > self.processTime:
 					self.processStarted = False
 					self.state = "OUTPUT"
 
