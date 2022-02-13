@@ -106,9 +106,6 @@ class ProductionLine:
 		fightersToGrinder = []
 		for fighter in self.fighters:
 			if fighter.state == "IN_MACHINE":
-				fighterTilePos = utilities.screenPosToTilePos(48, fighter.rect.center)
-				tileId = utilities.tilePosId(fighterTilePos)
-				machine = self.line[tileId].machine
 				continue
 
 			if self.stats["step"] - fighter.timeStamps["move"] < 10 + random.randint(0, 10):
