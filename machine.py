@@ -18,13 +18,11 @@ class Machine(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = machineTiles.get_tile_image(0, animation.ANIM_MAPPING["machine"]["gear"], 0)
 		self.rect = self.image.get_rect()
-		print(self.image)
 		self.subject = None
 		self.active = True
 		self.state = "WAITING"
 		self.mountedOn = mountedOn # factory lines section instance
 		self.rect.center = utilities.tilePosToScreenPos(48, self.mountedOn.tilePos)
-		print(self.rect.center)
 		self.lastInput = None
 		self.level = 1
 		self.processTime = 3
@@ -44,10 +42,10 @@ class Machine(pygame.sprite.Sprite):
 					self.mountedOn.tilePos
 				)
 				if len(fighterQue):
-					self.state = "PROCESSING"
-					self.processStarted = time.time()
 					self.subject = fighterQue[0]
+					self.state = "PROCESSING"
 					self.subject.state = "IN_MACHINE"
+					self.processStarted = time.time()
 					self.lastInput = self.subject.prodLineLastSections[-2]
 					print("""
 	last sects: {}
@@ -61,7 +59,6 @@ class Machine(pygame.sprite.Sprite):
 							self.output().tilePos
 						)
 					)
-					time.sleep(1)
 
 			elif self.state == "PROCESSING":
 				if time.time() - self.processStarted > self.processTime:
@@ -73,14 +70,14 @@ class Machine(pygame.sprite.Sprite):
 					self.output().tilePos
 				)
 				if len(outputQue) < 1:
-					self.subject.state = "IDLE"
-					if not self.mountedOn.prodLine.fightersAt(
-						self.mountedOn.tilePos
-					):
-						self.state = "WAITING"
-						print("move fighter to {}".format(self.output().tilePos))
-						self.subject.prodLineLastSections.append(self.output().tilePos)
-						self.subject.rect.center = utilities.tilePosToScreenPos(48, self.output().tilePos)
-				else:
-					print("{} fighters blocking: at {}: {}".format(self.mountedOn.tilePos, self.output().tilePos, len(outputQue)))
-					print("blocker #1: {} state:{}".format(utilities.screenPosToTilePos(48, outputQue[0].rect.center), outputQue[0].state))
+					fighter = self.subject
+					fighter.state = utilities.tilePosId(self.output().tilePos)
+					fighter.rect.center = utilities.tilePosToScreenPos(48, self.output().tilePos)
+					fighter.timeStamps["move"] = self.mountedOn.prodLine.stats["step"]
+					fighter.prodLineLastSections.append(self.output().tilePos)
+
+				subjects = self.mountedOn.prodLine.fightersAt(
+					self.mountedOn.tilePos
+				)
+				if len(subjects) < 1:
+				 	self.state = "WAITING"
