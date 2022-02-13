@@ -48,7 +48,8 @@ class Factory:
 		self.prodLine.step()
 
 		# let fighters in the factory
-		if not random.randint(0, 20):
+		fightersInFactory = 5
+		if len(self.prodLine.fighters) < fightersInFactory and random.randint(0, 20):
 			pos = self.inGate
 			if len(self.prodLine.fightersAt(pos)) == 0:
 				newFighter = Fighter(

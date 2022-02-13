@@ -109,12 +109,7 @@ class ProductionLine:
 				fighterTilePos = utilities.screenPosToTilePos(48, fighter.rect.center)
 				tileId = utilities.tilePosId(fighterTilePos)
 				machine = self.line[tileId].machine
-				print(tileId, time.time() - machine.processStarted, machine.output().tilePos)
-				# move fighter to output if it's not blocked: (should be in machine class)
-				# if len(self.fightersAt(machine.output().tilePos)) < 1:
-				# 	fighter.state = "IDLE"
-				# 	fighter.rect.center = utilities.tilePosToScreenPos(48, machine.output().tilePos)
-				#continue
+				continue
 
 			if self.stats["step"] - fighter.timeStamps["move"] < 10 + random.randint(0, 10):
 				continue
