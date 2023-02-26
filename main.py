@@ -22,28 +22,29 @@ from character import Fighter
 
 time.sleep(0)
 
-fighterInputs =	{
-	"A": [1180, 240],
-	"B": [10, 240]
-}
-
 teams = {
 	"orange": {
 		"name": "orange",
 		"color": (255, 87, 20),
-		"fighterInputs": [fighterInputs["A"]],
-		"primaryTarget": fighterInputs["B"]
+		"fighterInputs": [
+			"0x0",
+			"0x9",
+		],
+		"primaryTarget": "2x2",
 	},
 	"blue": {
 		"name": "blue",
 		"color": (25, 175, 255),
-		"fighterInputs": [fighterInputs["B"]],
-		"primaryTarget": fighterInputs["A"]
+		"fighterInputs": [
+			"2x2",
+			"2x2",
+		],
+		"primaryTarget": "0x0",
 	}
 }
 
 clock = pygame.time.Clock()
-meatGrinder = Grinder(teams, fighterInputs)
+meatGrinder = Grinder(teams)
 factory = Factory(teams["orange"], meatGrinder)
 
 

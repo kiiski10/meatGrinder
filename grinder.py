@@ -25,7 +25,12 @@ class Grinder:
 		self.stats = {
 			"step": 0
 		}
-
+		self.fighterInputs = {
+			"0x0": [1160, 0],
+			"0x9": [1160, 430],
+			"2x2": [10, 200],
+			"2x2": [10, 200],
+		}
 
 	def step(self):
 		self.stats["step"] += 1

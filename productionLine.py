@@ -57,6 +57,10 @@ class ProductionLine:
 
 		for tile_pos in self.factory.getTilesByLayer("prodLine"):
 			newSection = Section(tile_pos, self)
+			tile_pos_id = utilities.tilePosId(tile_pos)
+			if tile_pos_id in self.factory.grinder.fighterInputs:
+				output_pos = self.factory.grinder.fighterInputs[tile_pos_id]
+				newSection.output_gate_target = output_pos
 			self.line[utilities.tilePosId(tile_pos)] = newSection
 
 		# debug draw connections
