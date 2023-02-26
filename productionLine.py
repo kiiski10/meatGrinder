@@ -13,7 +13,7 @@ class Section:
 		self.fighters_here = []
 		self.selected_input = None
 		self.last_output_to_section = None
-		self.available_directions = [
+		all_directions = [
 			(self.tilePos[0] -1, self.tilePos[1]),
 			(self.tilePos[0] +1, self.tilePos[1]),
 			(self.tilePos[0], self.tilePos[1] +1),
