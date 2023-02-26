@@ -80,13 +80,14 @@ class Factory:
         pygame.Surface.blit(self.surface, targetSurface, [0, 0])
 
     def drawMachines(self, targetSurface):
-        machines = []
-        for s in self.line:
-            if self.line[s].machine:
-                machines.append(self.line[s].machine)
-
+        machines = [
+            x[1].machine
+            for x in self.prodLine.line.items()
+            if x[1].machine
+        ]
         for m in machines:
-            print(m)
+            x = m.parent_section.tilePos[0]
+            y = m.parent_section.tilePos[1]
             targetSurface.blit(
                 m.image, (x * self.tileMap.tilewidth, y * self.tileMap.tileheight)
             )
@@ -94,11 +95,11 @@ class Factory:
     def render(self):
         self.surface.fill((255, 255, 255))
         self.drawLayerByName("prodLine", self.surface)
-        self.drawLayerByName("machines", self.surface)
         self.drawLayerByName("fighterIn", self.surface)
         self.drawLayerByName("fighterOut", self.surface)
         self.drawLayerByName("arrows", self.surface)
         self.fighterSurface.fill((255, 0, 255))
         self.fighterSprites.draw(self.surface)
+        self.drawMachines(self.surface)
 
         pygame.Surface.blit(self.surface, self.fighterSurface, [0, 0])
