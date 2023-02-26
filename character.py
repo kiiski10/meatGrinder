@@ -133,9 +133,13 @@ class Fighter(pygame.sprite.Sprite):
 
 
 	def takeHit(self, hit, angle):
-		damage = (hit["baseDamage"] * hit["level"]) * self.equipment["armor"].damageMultiplier
+		armor = self.equipment.get("armor", None)
+		damage = hit["baseDamage"] * hit["level"]
+		
+		if armor:
+			damage *= armor.damageMultiplier
+
 		self.health -= damage
-		# print("{} got hit. damage: {}/{}".format(self.team["name"], damage, hit["baseDamage"]))
 		bloodAmount = int(damage / 6)
 		if bloodAmount < 1:
 			bloodAmount = 1
@@ -166,11 +170,12 @@ class Fighter(pygame.sprite.Sprite):
 
 
 	def hit(self, distance):
+		hit = False
+		weapon = self.equipment.get("weapon", None)
 		self.timeStamps["hit"] = self.frame
 
 		# 1. define hit area
 		self.lastHitArea = pygame.Rect((100,100), (distance, distance))
-
 		self.lastHitArea.center = utilities.angleDistToPos(
 			self.centerPoint(),
 			self.dir,
@@ -179,23 +184,21 @@ class Fighter(pygame.sprite.Sprite):
 
 		# 2. find players in the area
 		enemiesInArea = []
-
 		for p in self.world.enemiesOf[self.team["name"]]:
 			if self.lastHitArea.colliderect(p.rect) and p.state != "DEAD":
 				enemiesInArea.append(p)
 
 		# 3. deal damage to players
-		for e in enemiesInArea:
-			e.takeHit(self.equipment["weapon"].hit, self.dir)
-
-		if len(enemiesInArea) > 0:
-			return(True)
-		else:
-			return(False)
+		if weapon:
+			for e in enemiesInArea:
+				e.takeHit(weapon.hit, self.dir)
+				hit = True
+		return(hit)
 
 
 	def step(self, frame):
 		self.frame = frame
+		weapon = self.equipment.get("weapon", None)
 
 		# change animation frame on every other step
 		self.advAnim = not self.advAnim
