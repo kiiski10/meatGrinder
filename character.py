@@ -3,7 +3,20 @@ import utilities
 import animation
 from equipment import *
 
+class CharacterStates:
+	"""
+		Possible states for game characters
+	"""
 
+	idle = "IDLE"
+	move = "MOVE"
+	fight = "INFIGHT"
+	search = "SEARCH"
+	stun = "STUN"
+	dead = "DEAD"
+
+
+	
 class Fighter(pygame.sprite.Sprite):
 	def __init__(
 			self, speed=1, world=None, selectedEquipment=[], team=None, spawnPos=[100, 200]
@@ -20,7 +33,7 @@ class Fighter(pygame.sprite.Sprite):
 		self.enemyDetectionAreaSize = 400
 		self.dir = 45
 		self.speed = speed + random.randint(10, 30) / 10
-		self.state = "IDLE" # IDLE, SEARCH, MOVE, INFIGHT, IN_MACHINE, STUNNED, DEAD
+		self.state = CharacterStates.idle
 		self.searchInterval = random.randint(10, 15)
 		self.team = team
 		self.health = 100
@@ -57,9 +70,9 @@ class Fighter(pygame.sprite.Sprite):
 
 		self.timeStamps = {
 			"hit": 0,
-			"stun": 0,
-			"move": 0,
-			"search": 0,
+			CharacterStates.stun: 0,
+			CharacterStates.move: 0,
+			CharacterStates.search: 0,
 		}
 
 		# generate anim frames
@@ -100,7 +113,7 @@ class Fighter(pygame.sprite.Sprite):
 
 
 	def findTarget(self):
-		self.timeStamps["search"] = self.frame
+		self.timeStamps[CharacterStates.search] = self.frame
 		enemyRects = []
 		for e in self.world.enemiesOf[self.team["name"]]:
 			enemyRects.append(e.rect)
@@ -149,7 +162,7 @@ class Fighter(pygame.sprite.Sprite):
 					)
 				)
 			self.world.fighters.remove(self)
-			self.state = "DEAD"
+			self.state = CharacterStates.dead
 
 
 	def hit(self, distance):
@@ -194,44 +207,38 @@ class Fighter(pygame.sprite.Sprite):
 		if self.debug:
 			utilities.drawDebugLayer(self)
 
-		if self.frame - self.timeStamps["search"] > self.searchInterval:
-			self.state = "SEARCH"
+		if self.frame - self.timeStamps[CharacterStates.search] > self.searchInterval:
+			self.state = CharacterStates.search
 
-		if self.state == "SEARCH":
+		if self.state == CharacterStates.search:
 			self.target = self.findTarget()
 			self.dir = utilities.angleTo(self.rect.center, self.target.center)
-			self.state = "MOVE"
+			self.state = CharacterStates.move
 
 		if not self.target:
-			self.target = pygame.Rect(self.team["primaryTarget"], (3,3))
+			target = self.world.fighterInputs[self.team["primaryTarget"]]
+			self.target = pygame.Rect(target, (3,3))
 
 		dist = utilities.distTo(self.rect.center, self.target.center)
 		angle = utilities.angleTo(self.rect.center, self.target.center)
 
-		if self.state == "IDLE":
-			self.state = "SEARCH"
+		if self.state == CharacterStates.idle:
+			self.state = CharacterStates.search
 
-		elif self.state == "MOVE":
+		elif self.state == CharacterStates.move:
+			self.move()
 
-			if dist < self.equipment["weapon"].reach * 3:
-				oldSpeed = self.speed
-				self.speed *= 0.5
-				self.move()
-				self.speed = oldSpeed
-			else:
-				self.move()
-
-		elif self.state == "INFIGHT":
-			if self.frame - self.timeStamps["hit"] > self.equipment["weapon"].weight:
+		elif self.state == CharacterStates.fight:
+			if weapon and self.frame - self.timeStamps["hit"] > weapon.weight:
 				success = False
-				if dist < self.equipment["weapon"].reach:
+				if dist < weapon.reach:
 					success = self.hit(dist)
 				if not success:
-					self.state = "MOVE"
-					self.timeStamps["move"] = self.frame
+					self.state = CharacterStates.move
+					self.timeStamps[CharacterStates.move] = self.frame
 					self.dir = angle - 180
 					if angle < 0:
 						angle += 360
 
-		if dist < self.equipment["weapon"].reach:
-			self.state = "INFIGHT"
+		if weapon and dist < weapon.reach:
+			self.state = CharacterStates.fight
