@@ -13,71 +13,24 @@ APP_PATH = os.path.dirname(os.path.realpath(__file__)) + os.sep
 machineTiles = load_pygame(os.path.join(APP_PATH, "tiles", "factory", "machines.tmx"))
 
 class Machine(pygame.sprite.Sprite):
-	def __init__(self, mountedOn):
+	def __init__(self, parent_section):
 		print("machine init")
 		pygame.sprite.Sprite.__init__(self)
 		self.image = machineTiles.get_tile_image(0, animation.ANIM_MAPPING["machine"]["gear"], 0)
 		self.rect = self.image.get_rect()
-		self.subject = None
+		self.parent_section = parent_section
+		self.rect.center = utilities.tilePosToScreenPos(48, self.parent_section.tilePos)
 		self.active = True
-		self.state = "WAITING"
-		self.mountedOn = mountedOn # factory lines section instance
-		self.rect.center = utilities.tilePosToScreenPos(48, self.mountedOn.tilePos)
-		self.lastInput = None
 		self.level = 1
 		self.processTime = 3
-		self.processStarted = False
+		self.process_start_time = 0
+		self.objects_in_process = []
 
-	def output(self):
-		pos = self.mountedOn.tilePos
-		for s in self.mountedOn.prodLine.neighboringSections(pos):
-			if s.tilePos != self.lastInput:
-				return(s)
-		raise Exception("No output found for machine at {}".format(pos))
+	def process_in_progress(self):
+		if self.process_start_time == 0:
+			return(False)
+		else:
+			return(
+				time.time() - self.process_start_time < self.processTime
+			)
 
-	def step(self):
-		if self.active:
-			if self.state == "WAITING":
-				fighterQue = self.mountedOn.prodLine.fightersAt(
-					self.mountedOn.tilePos
-				)
-				if len(fighterQue):
-					self.subject = fighterQue[0]
-					self.state = "PROCESSING"
-					self.subject.state = "IN_MACHINE"
-					self.processStarted = time.time()
-					self.lastInput = self.subject.prodLineLastSections[-2]
-					print("""
-	last sects: {}
-	last input: {}
-	mount point:{}
-	output:     {}
-						""".format(
-							self.subject.prodLineLastSections,
-							self.lastInput,
-							self.mountedOn.tilePos,
-							self.output().tilePos
-						)
-					)
-
-			elif self.state == "PROCESSING":
-				if time.time() - self.processStarted > self.processTime:
-					self.processStarted = False
-					self.state = "OUTPUT"
-
-			elif self.state == "OUTPUT":
-				outputQue = self.mountedOn.prodLine.fightersAt(
-					self.output().tilePos
-				)
-				if len(outputQue) < 1:
-					fighter = self.subject
-					fighter.state = utilities.tilePosId(self.output().tilePos)
-					fighter.rect.center = utilities.tilePosToScreenPos(48, self.output().tilePos)
-					fighter.timeStamps["move"] = self.mountedOn.prodLine.stats["step"]
-					fighter.prodLineLastSections.append(self.output().tilePos)
-
-				subjects = self.mountedOn.prodLine.fightersAt(
-					self.mountedOn.tilePos
-				)
-				if len(subjects) < 1:
-				 	self.state = "WAITING"

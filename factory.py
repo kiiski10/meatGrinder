@@ -48,21 +48,20 @@ class Factory:
 		self.prodLine.step()
 
 		# let fighters in the factory
-		fightersInFactory = 5
-		if len(self.prodLine.fighters) < fightersInFactory and random.randint(0, 20):
-			pos = self.inGate
-			if len(self.prodLine.fightersAt(pos)) == 0:
-				newFighter = Fighter(
-					world=self.grinder,
-					team=self.team,
-					spawnPos=[0,0],
-					speed=2,
-					selectedEquipment=[]
-				)
+		pos = self.inGate
+		in_gate_section = self.prodLine.line[utilities.tilePosId(pos)]
+		if len(in_gate_section.fighters_here) == 0:
+			newFighter = Fighter(
+				world=self.grinder,
+				team=self.team,
+				spawnPos=[0,0],
+				speed=2,
+				selectedEquipment=[]
+			)
 
-				newFighter.rect.center = utilities.tilePosToScreenPos(48, pos)
-				self.prodLine.addFighter(newFighter)
-				self.fighterSprites.add(newFighter)
+			newFighter.rect.center = utilities.tilePosToScreenPos(48, pos)
+			self.prodLine.addFighter(newFighter)
+			self.fighterSprites.add(newFighter)
 
 
 	def drawLayerByName(self, layerName, targetSurface):
