@@ -2,7 +2,7 @@ import pygame, random
 import utilities
 
 class Grinder:
-	def __init__(self, teams, inputs):
+	def __init__(self, teams):
 		print("grinder init")
 		self.surface = pygame.Surface((1200, 480))
 		self.debugLayer = pygame.Surface(self.surface.get_rect().size)
@@ -11,8 +11,7 @@ class Grinder:
 		self.bloodNcorpseLayer.fill((255,255,255)) # TODO: draw the fight arena here
 		self.bloodNcorpseLayer.set_colorkey((255, 0, 255))
 		self.bloodDropLayer = pygame.Surface(self.surface.get_rect().size)
-		self.bloodDropLayer.set_colorkey((0, 0, 0))
-		self.inputs = inputs # [{"name": "A", "pos": [x, y], "que": []}]
+		self.bloodDropLayer.set_colorkey((0, 0, 0))		
 		self.fighters = []
 		self.teams = teams
 		self.bloodDrops = []

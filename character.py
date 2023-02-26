@@ -124,7 +124,7 @@ class Fighter(pygame.sprite.Sprite):
 		if index != -1:
 			return(enemyRects[index])
 		else:
-			return(pygame.Rect(self.team["primaryTarget"], (20, 20)))
+			return(pygame.Rect(self.world.fighterInputs[self.team["primaryTarget"]], (20, 20)))
 
 
 	def move(self):
