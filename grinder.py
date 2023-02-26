@@ -48,8 +48,8 @@ class Grinder:
 
 
 	def addBloodDrop(self, pos, dir, damage, color):
-		if len(self.bloodDrops) > 1000:
-			draw = not random.randint(0, 70)
+		if len(self.bloodDrops) > 1000:		   # limit drawing of blood
+			draw = random.randint(0, 9) < 4   # 40% chance to draw if over 1000 drops
 		else:
 			draw = True
 
