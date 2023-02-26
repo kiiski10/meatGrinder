@@ -19,6 +19,8 @@ class Section:
 			(self.tilePos[0], self.tilePos[1] +1),
 			(self.tilePos[0], self.tilePos[1] -1)
 		]
+		# list only tiles inside of factory area
+		self.available_directions = [ x for x in all_directions if x[0] <= 9 and x[1] <= 9 and x[0] >= 0 and x[1] >= 0 ]
 
 	def possible_outputs(self):
 		possible_outputs = []
