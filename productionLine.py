@@ -86,17 +86,7 @@ class ProductionLine:
 		pos_id = utilities.tilePosId(pos)
 		section = self.line[pos_id]
 		section.fighters_here.append(newFighter)
-		newFighter.prodLineLastSections = [section]
-
-	def print_prodline(self):
-		line_str = "".join(
-			[
-				"[{}]".format(len(section.fighters_here)) if section.fighters_here
-				else "[ ]"
-				for pos_id, section in self.line.items()
-			]
-		)
-		print(line_str)
+		self.factory.fighterSprites.add(newFighter)
 
 	def lineAdvance(self):
 		# move fighters

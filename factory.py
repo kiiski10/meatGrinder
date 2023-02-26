@@ -61,7 +61,6 @@ class Factory:
 
 			newFighter.rect.center = utilities.tilePosToScreenPos(48, pos)
 			self.prodLine.addFighter(newFighter)
-			self.fighterSprites.add(newFighter)
 
 
 	def drawLayerByName(self, layerName, targetSurface):
