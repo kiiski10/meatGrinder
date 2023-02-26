@@ -48,7 +48,8 @@ class ProductionLine:
 		self.debugLayer.set_colorkey((255, 0, 255))
 		self.debugLayer.fill((255, 0, 255))
 		self.stats = {
-			"step": 0
+			"step": 0,
+			"last_step_time": 0,
 		}
 
 		self.line = {
@@ -104,11 +105,19 @@ class ProductionLine:
 					if not output.selected_input:
 						output.selected_input = section
 
-	def move_fighter_to_grinder(self, fighter, spawn_pos):
-		# TODO: remove fighter from prodline section here
-		fighter.tilePos = spawn_pos
+	def move_fighter_to_grinder(self, fighter, gate_section):
+		fighter.rect.center = gate_section.output_gate_target
 		self.factory.grinder.fighters.append(fighter)
+		gate_section.fighters_here.remove(fighter)
+		self.factory.fighterSprites.remove(fighter)
 
 	def step(self):
 		self.stats["step"] += 1
-		self.lineAdvance()
+		if time.time() - self.stats["last_step_time"] > 0.25:
+			self.stats["last_step_time"] = time.time()
+			self.lineAdvance()
+		
+		for gate in self.outGates:
+			gate_section = self.line[utilities.tilePosId(gate)]
+			for fighter in gate_section.fighters_here:
+				self.move_fighter_to_grinder(fighter, gate_section)
