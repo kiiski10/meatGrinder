@@ -31,15 +31,16 @@ class Section:
         possible_outputs = []
         for pos in self.available_directions:
             key = utilities.tilePosId(pos)
-            if self.selected_input and pos == self.selected_input.tilePos:
-                continue
             if key in self.prodLine.line:
                 possible_outputs.append(self.prodLine.line[key])
         return possible_outputs
 
     def next_section(self):
-        if self.possible_outputs():
-            section = random.choice(self.possible_outputs())
+        possible_outputs = self.possible_outputs()
+        if self.selected_input in possible_outputs:
+            possible_outputs.remove(self.selected_input)       
+        if possible_outputs:
+            section = random.choice(possible_outputs)
         else:
             section = self
         return section
@@ -100,7 +101,6 @@ class ProductionLine:
 
     def lineAdvance(self):
         # move fighters
-        # self.print_prodline()
         for pos_id, section in self.line.items():
             output = section.next_section()
             if len(section.fighters_here) > 0 and len(output.fighters_here) == 0:
