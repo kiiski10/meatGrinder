@@ -3,8 +3,9 @@ import utilities
 
 
 class Grinder:
-    def __init__(self, teams):
+    def __init__(self, teams, debug=False):
         print("grinder init")
+        self.debug = debug
         self.surface = pygame.Surface((1200, 480))
         self.debugLayer = pygame.Surface(self.surface.get_rect().size)
         self.debugLayer.set_colorkey((255, 0, 255))
@@ -16,8 +17,6 @@ class Grinder:
         self.fighters = []
         self.teams = teams
         self.bloodDrops = []
-        self.debug = False
-        # self.debug = True
         self.teamsFilteredOn = 0
         self.enemiesOf = {}
         for t in self.teams:
@@ -104,7 +103,3 @@ class Grinder:
         # renderFighters
         for f in self.fighters:
             pygame.Surface.blit(self.surface, f.image, f.rect.center)
-
-        # render debug layer
-        if self.debug:
-            pygame.Surface.blit(self.surface, self.debugLayer, [0, 0])

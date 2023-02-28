@@ -21,8 +21,6 @@ class Fighter(pygame.sprite.Sprite):
     def __init__(
         self, speed=1, world=None, selectedEquipment=[], team=None, spawnPos=[100, 200]
     ):
-        # self.debug = True
-        self.debug = False
         pygame.sprite.Sprite.__init__(self)
         self.image = fighterTiles.get_tile_image(
             4, 0, 0
@@ -208,7 +206,7 @@ class Fighter(pygame.sprite.Sprite):
                     self.anim["MOVE"][utilities.dirAsCompassDir(self.dir)]
                 )
 
-        if self.debug:
+        if self.world.debug:
             utilities.drawDebugLayer(self)
 
         if self.frame - self.timeStamps[CharacterStates.search] > self.searchInterval:
