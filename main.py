@@ -1,7 +1,6 @@
 import time, random, pygame
 import utilities
 TARGET_LOOPS_PER_SEC = 130
-START_PLAYER_COUNT = 2
 
 WINDOW_SIZE = [1700, 600]
 # FULLSCREEN = True
@@ -46,12 +45,12 @@ clock = pygame.time.Clock()
 meatGrinder = Grinder(teams, debug=DEBUG)
 factory = Factory(teams["orange"], meatGrinder)
 frame_counter = 0
-step_counter = 0
-step_interval = 0.014 # 60/s
+game_loop_counter = 0
+game_loop_min_delay = 0.014 # 0.014 = max 60 loops per sec
 steps_per_sec_timer = time.time()
 
 winTitleExtraText = "SPD:{}/{} | FPS:{} | BLOOD:{} | STEP:{}".format(
-    step_counter,
+    game_loop_counter,
     TARGET_LOOPS_PER_SEC,
     frame_counter,
     len(meatGrinder.bloodDrops),
@@ -124,19 +123,19 @@ def game_step():
 
 
 while handleEvents():
-    step_counter += 1
+    game_loop_counter += 1
 
     # Update window title
     if time.time() - steps_per_sec_timer >= 1:
         winTitleExtraText = "SPD:{}/{} | FPS:{} | BLOOD:{} | STEP:{}".format(
-            step_counter,
+            game_loop_counter,
             TARGET_LOOPS_PER_SEC,
             frame_counter,
             len(meatGrinder.bloodDrops),
             meatGrinder.step_count,
         )
         steps_per_sec_timer = time.time()
-        step_counter = 0
+        game_loop_counter = 0
         frame_counter = 0
         pygame.display.set_caption(
             "MeatGrinder | Fighters: {} | {}".format(
@@ -144,7 +143,7 @@ while handleEvents():
             )
         )
 
-    if time.time() - meatGrinder.last_step_time > step_interval:
+    if time.time() - meatGrinder.last_step_time > game_loop_min_delay:
         frame_counter += 1
 
         if random.randint(0, 100) < 10: # % chance to spawn new fighter on each round
