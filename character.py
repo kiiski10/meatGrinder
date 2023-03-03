@@ -151,30 +151,41 @@ class Fighter(pygame.sprite.Sprite):
         if armor:
             damage *= armor.damageMultiplier
 
+        self.spill_blood(damage, angle)
+
         self.health -= damage
-        bloodAmount = int(damage / 6)
+        if self.health <= 0:
+            self.die()
+
+    def spill_blood(self, force, angle):
+        bloodAmount = int(force / 6)
         if bloodAmount < 1:
             bloodAmount = 1
 
         for d in range(bloodAmount):
             self.world.addBloodDrop(
-                self.centerPoint(),
-                angle + random.randint(-10, 10),
-                damage + random.randint(7, 10),
-                ((255 - random.randint(0, 55)) - damage, damage, damage),
+                pos=self.centerPoint(),
+                dir=angle + random.randint(-10, 10),
+                damage=force + random.randint(7, 10),
+                color=(
+                    (255 - random.randint(0, 55)) - force,
+                    force,
+                    force
+                ),
             )
-        if self.health <= 0:
-            skeletonColors = [(155, 155, 105), (55, 55, 55)]
-            i = 0
-            for sColor in skeletonColors:
-                i += 1
-                tintColor = sColor
-                bones = utilities.tintImage(self.image, sColor)
-                self.world.bloodNcorpseLayer.blit(
-                    bones, (self.rect.center[0] - i, self.rect.center[1] - i)
-                )
-            self.world.fighters.remove(self)
-            self.state = CharacterStates.dead
+
+    def die(self):
+        skeletonColors = [(155, 155, 105), (55, 55, 55)]
+        i = 0
+        for sColor in skeletonColors:
+            i += 1
+            bones = utilities.tintImage(self.image, sColor)
+            self.world.bloodNcorpseLayer.blit(
+                bones, (self.rect.center[0] - i, self.rect.center[1] - i)
+            )
+        self.world.fighters.remove(self)
+        self.world.fighterSprites.remove(self)
+        self.state = CharacterStates.dead
 
     def hit(self, distance):
         hit = False
