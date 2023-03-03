@@ -1,4 +1,5 @@
-import pygame, math
+import math, time
+import pygame
 
 pygame.font.init()
 font = pygame.font.SysFont("Monotype", 12)
@@ -83,8 +84,8 @@ def drawDebugLayer(grinder):
             pygame.draw.line(
                 fighter.world.debugLayer,
                 (20, 10, 40),
-                (fighter.rect.center[0] + 24, fighter.rect.center[1] + 24),
-                (fighter.target.center[0] + 24, fighter.target.center[1] + 24),
+                (fighter.rect.center[0], fighter.rect.center[1]),
+                (fighter.target.center[0], fighter.target.center[1]),
                 1,
             )
 
@@ -96,9 +97,7 @@ def drawDebugLayer(grinder):
             fighter.lastHitArea = None
 
         # health bar
-        x = fighter.rect.x + fighter.rect.width * 0.5
-        y = fighter.rect.y + fighter.rect.height * 1.5
-
+        x, y = fighter.rect.bottomleft
         pygame.draw.line(
             fighter.world.debugLayer,
             (20, 130, 30),
@@ -109,6 +108,17 @@ def drawDebugLayer(grinder):
 
         # state text
         textsurface = font.render(fighter.state, False, (0, 0, 0))
-        x = fighter.rect.x + fighter.rect.width * 0.5
-        y = fighter.rect.y + fighter.rect.height * 1.5
+        x, y = fighter.rect.bottomleft
         fighter.world.debugLayer.blit(textsurface, (x, y))
+
+
+def time_this(func):
+    def wrapper_func(*args, **kwargs):
+        start_time = time.time()
+        func(*args, **kwargs)
+        print("{module: >10}.{name} {run_time: >25}ms".format(
+            module=func.__module__,
+            name=func.__name__,
+            run_time=round((time.time() - start_time) * 1000, 6),     # ms
+        ))
+    return wrapper_func

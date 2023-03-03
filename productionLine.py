@@ -119,6 +119,7 @@ class ProductionLine:
     def move_fighter_to_grinder(self, fighter, gate_section):
         fighter.rect.center = gate_section.output_gate_target
         self.factory.grinder.fighters.append(fighter)
+        self.factory.grinder.fighterSprites.add(fighter) # TODO: move this to add_fighter method in Grinder
         gate_section.fighters_here.remove(fighter)
         self.factory.fighterSprites.remove(fighter)
 
