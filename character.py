@@ -97,6 +97,15 @@ class Fighter(pygame.sprite.Sprite):
 
             self.anim["MOVE"][d] = frames
 
+    def __str__(self):
+        tile_pos = utilities.screenPosToTilePos(48, self.rect.center)
+        tile_pos_id = utilities.tilePosId(tile_pos)
+        return("Fighter{} Team:'{}'".format(
+            tile_pos_id,
+            self.team["name"],
+        ))
+    
+
     def centerPoint(self):
         return [
             int(self.rect.center[0] + self.rect.width / 2),
@@ -132,7 +141,7 @@ class Fighter(pygame.sprite.Sprite):
             self.animFrame
         ]
         self.rect.center = utilities.angleDistToPos(
-            self.rect.center, self.dir, 1.1 * self.speed
+            self.rect.center, self.dir, 0.6 * self.speed
         )
 
     def takeHit(self, hit, angle):
@@ -205,9 +214,6 @@ class Fighter(pygame.sprite.Sprite):
                 self.animFrame -= len(
                     self.anim["MOVE"][utilities.dirAsCompassDir(self.dir)]
                 )
-
-        if self.world.debug:
-            utilities.drawDebugLayer(self)
 
         if self.frame - self.timeStamps[CharacterStates.search] > self.searchInterval:
             self.state = CharacterStates.search

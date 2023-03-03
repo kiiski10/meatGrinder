@@ -74,37 +74,41 @@ def tilePosId(pos):
 
 
 def drawDebugLayer(grinder):
-    # target line
-    if grinder.target:
+    # Clear canvas
+    grinder.debugLayer.fill((255, 0, 255))
+
+    for fighter in grinder.fighters:
+        # target line
+        if fighter.target:
+            pygame.draw.line(
+                fighter.world.debugLayer,
+                (20, 10, 40),
+                (fighter.rect.center[0] + 24, fighter.rect.center[1] + 24),
+                (fighter.target.center[0] + 24, fighter.target.center[1] + 24),
+                1,
+            )
+
+        # hit marker
+        if fighter.lastHitArea:
+            pygame.draw.rect(
+                fighter.world.debugLayer, (200, 30, 30), fighter.lastHitArea, 0
+            )
+            fighter.lastHitArea = None
+
+        # health bar
+        x = fighter.rect.x + fighter.rect.width * 0.5
+        y = fighter.rect.y + fighter.rect.height * 1.5
+
         pygame.draw.line(
-            grinder.world.debugLayer,
-            (20, 10, 40),
-            (grinder.rect.center[0] + 24, grinder.rect.center[1] + 24),
-            (grinder.target.center[0] + 24, grinder.target.center[1] + 24),
-            1,
+            fighter.world.debugLayer,
+            (20, 130, 30),
+            (x, y),
+            (x + (fighter.health / 100) * fighter.rect.width, y),
+            3,
         )
 
-    # hit marker
-    if grinder.lastHitArea:
-        pygame.draw.rect(
-            grinder.world.debugLayer, (200, 30, 30), grinder.lastHitArea, 0
-        )
-        grinder.lastHitArea = None
-
-    # health bar
-    x = grinder.rect.x + grinder.rect.width * 0.5
-    y = grinder.rect.y + grinder.rect.height * 1.5
-
-    pygame.draw.line(
-        grinder.world.debugLayer,
-        (20, 130, 30),
-        (x, y),
-        (x + (grinder.health / 100) * grinder.rect.width, y),
-        3,
-    )
-
-    # state text
-    textsurface = font.render(grinder.state, False, (0, 0, 0))
-    x = grinder.rect.x + grinder.rect.width * 0.5
-    y = grinder.rect.y + grinder.rect.height * 1.5
-    grinder.world.debugLayer.blit(textsurface, (x, y))
+        # state text
+        textsurface = font.render(fighter.state, False, (0, 0, 0))
+        x = fighter.rect.x + fighter.rect.width * 0.5
+        y = fighter.rect.y + fighter.rect.height * 1.5
+        fighter.world.debugLayer.blit(textsurface, (x, y))

@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, time
 import utilities
 
 
@@ -6,9 +6,11 @@ class Grinder:
     def __init__(self, teams, debug=False):
         print("grinder init")
         self.debug = debug
+        self.last_step_time = time.time()
         self.surface = pygame.Surface((1200, 480))
         self.debugLayer = pygame.Surface(self.surface.get_rect().size)
         self.debugLayer.set_colorkey((255, 0, 255))
+        self.debugLayer.fill((255, 0, 255))
         self.bloodNcorpseLayer = pygame.Surface(self.surface.get_rect().size)
         self.bloodNcorpseLayer.fill((255, 255, 255))  # TODO: draw the fight arena here
         self.bloodNcorpseLayer.set_colorkey((255, 0, 255))
@@ -21,7 +23,7 @@ class Grinder:
         self.enemiesOf = {}
         for t in self.teams:
             self.enemiesOf[t] = []
-        self.stats = {"step": 0}
+        self.step_count = 0
         self.fighterInputs = {
             "0x0": [1160, 0],
             "0x9": [1160, 430],
@@ -30,10 +32,11 @@ class Grinder:
         }
 
     def step(self):
-        self.stats["step"] += 1
+        self.step_count += 1
+        self.last_step_time = time.time()
 
-        if self.stats["step"] - self.teamsFilteredOn > 10:
-            self.teamsFilteredOn = self.stats["step"]
+        if self.step_count - self.teamsFilteredOn > 10:
+            self.teamsFilteredOn = self.step_count
 
             for t in self.teams:
                 self.enemiesOf[t] = []
@@ -42,7 +45,7 @@ class Grinder:
                 self.enemiesOf[t] = self.listEnemies(t)
 
         for f in self.fighters:
-            f.step(self.stats["step"])
+            f.step(self.step_count)
 
     def addBloodDrop(self, pos, dir, damage, color):
         if len(self.bloodDrops) > 1000:  # limit drawing of blood
@@ -53,7 +56,7 @@ class Grinder:
         if draw:
             self.bloodDrops.append(
                 {
-                    "spiltOnFrame": self.stats["step"],
+                    "spiltOnFrame": self.step_count,
                     "damage": damage,
                     "dir": dir,
                     "speed": 7,
@@ -66,7 +69,7 @@ class Grinder:
         self.bloodDropLayer.fill((0, 0, 0))
 
         for b in self.bloodDrops:
-            lifeTime = self.stats["step"] - b["spiltOnFrame"]
+            lifeTime = self.step_count - b["spiltOnFrame"]
             x = b["pos"][0]
             y = b["pos"][1]
             x, y = utilities.angleDistToPos(b["pos"], b["dir"], lifeTime * b["speed"])
@@ -94,11 +97,15 @@ class Grinder:
         pygame.Surface.blit(self.surface, self.bloodNcorpseLayer, [0, 0])
         pygame.Surface.blit(self.surface, self.bloodDropLayer, [0, 0])
 
-    def listEnemies(self, team):
-        return list(filter(lambda x: x.team["name"] != team, self.fighters))
+    def listEnemies(self, team_name):
+        """
+        List enemy fighters for a given team.
+        """
+        return [x for x in self.fighters if x.team["name"] != team_name]
 
     def render(self):
         self.drawBlood()
+        utilities.drawDebugLayer(self)
 
         # renderFighters
         for f in self.fighters:

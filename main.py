@@ -1,6 +1,6 @@
 import time, random, pygame
 
-TARGET_FPS = 30
+TARGET_LOOPS_PER_SEC = 130
 START_PLAYER_COUNT = 2
 
 WINDOW_SIZE = [1700, 600]
@@ -20,8 +20,6 @@ from equipment import *
 from grinder import Grinder
 from factory import Factory
 from character import Fighter
-
-time.sleep(0)
 
 teams = {
     "orange": {
@@ -91,36 +89,46 @@ def randomEquipments(n):
 
 pygame.event.get()
 running = True
-
+frame_counter = 0
 stepPerSecCounter = 0
 stepPerSecTimer = time.time()
-winTitleExtraText = "FPS:{}/{} | BLOOD:{} | STEP:{}".format(
+winTitleExtraText = "SPD:{}/{} | FPS:{} | BLOOD:{} | STEP:{}".format(
     stepPerSecCounter,
-    TARGET_FPS,
+    TARGET_LOOPS_PER_SEC,
+    frame_counter,
     len(meatGrinder.bloodDrops),
-    meatGrinder.stats["step"],
+    meatGrinder.step_count,
 )
+pygame.display.set_caption(
+    "MeatGrinder | {}".format(
+        winTitleExtraText
+    )
+)
+
+step_interval = 0.014
 
 while running:
     stepPerSecCounter += 1
     running = handleEvents()
     displaySurf.fill((120, 120, 120))
-    if DEBUG:
-        meatGrinder.debugLayer.fill((255, 0, 255))
-    meatGrinder.step()
-    factory.step()
-    meatGrinder.render()
-    factory.render()
 
-    surfaceYPos = (displaySurf.get_height() - meatGrinder.surface.get_height()) / 2
-    surfaceXPos = meatGrinder.surface.get_width() + 10
+    if time.time() - meatGrinder.last_step_time > step_interval:
+        frame_counter += 1
+        meatGrinder.step()
+        if meatGrinder.step_count - factory.advanced_on_grinder_step > factory.grinder_steps_between_steps: 
+            factory.step(meatGrinder.step_count)
+            factory.render()
+        meatGrinder.render()
 
-    displaySurf.blit(meatGrinder.surface, (5, surfaceYPos))
-    if DEBUG:
-        displaySurf.blit(meatGrinder.debugLayer, (5, surfaceYPos))
-    displaySurf.blit(factory.surface, (surfaceXPos, surfaceYPos))
+        surfaceYPos = (displaySurf.get_height() - meatGrinder.surface.get_height()) / 2
+        surfaceXPos = meatGrinder.surface.get_width() + 10
 
-    pygame.display.flip()
+        displaySurf.blit(meatGrinder.surface, (5, surfaceYPos))
+        if DEBUG:
+            displaySurf.blit(meatGrinder.debugLayer, (5, surfaceYPos))
+        displaySurf.blit(factory.surface, (surfaceXPos, surfaceYPos))
+
+        pygame.display.flip()
 
     ## spawn enemy fighters
     spawnTime = not random.randint(0, 45)
@@ -129,20 +137,22 @@ while running:
         addFighter("blue", [24, 250], speed, randomEquipments(4))
 
     if time.time() - stepPerSecTimer >= 1:
-        winTitleExtraText = "FPS:{}/{} | BLOOD:{} | STEP:{}".format(
+        winTitleExtraText = "SPD:{}/{} | FPS:{} | BLOOD:{} | STEP:{}".format(
             stepPerSecCounter,
-            TARGET_FPS,
+            TARGET_LOOPS_PER_SEC,
+            frame_counter,
             len(meatGrinder.bloodDrops),
-            meatGrinder.stats["step"],
+            meatGrinder.step_count,
         )
         stepPerSecTimer = time.time()
         stepPerSecCounter = 0
-    pygame.display.set_caption(
-        "MeatGrinder | Fighters: {} | {}".format(
-            len(meatGrinder.fighters), winTitleExtraText
+        frame_counter = 0
+        pygame.display.set_caption(
+            "MeatGrinder | Fighters: {} | {}".format(
+                len(meatGrinder.fighters), winTitleExtraText
+            )
         )
-    )
-    clock.tick(TARGET_FPS)
+    clock.tick(TARGET_LOOPS_PER_SEC)
 
 pygame.quit()
 print("QUIT BYE")

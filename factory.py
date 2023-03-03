@@ -1,4 +1,4 @@
-import pygame, random, os
+import pygame, os
 from pytmx import load_pygame
 from productionLine import ProductionLine
 from character import Fighter
@@ -17,6 +17,8 @@ class Factory:
         self.tileMap = load_pygame(
             os.path.join(APP_PATH, "tiles", "factory", "factory.tmx")
         )
+        self.grinder_steps_between_steps = 10
+        self.advanced_on_grinder_step = 0
         self.surface = pygame.Surface((480, 480))
         _surfsize = self.surface.get_rect().size
         self.arrowSurface = pygame.Surface(_surfsize)
@@ -45,7 +47,8 @@ class Factory:
                 tileCoords.append((x, y))
         return tileCoords
 
-    def step(self):
+    def step(self, step):
+        self.advanced_on_grinder_step = step   
         self.stats["step"] += 1
         self.prodLine.step()
 
