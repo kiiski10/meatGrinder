@@ -5,7 +5,6 @@ import animation
 
 """
 	TODO:
-	- make better location system for fighters in production lines
 	- load & render sprites for machines properly
 """
 
