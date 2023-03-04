@@ -1,4 +1,6 @@
-import random, pygame
+import random
+import pygame
+
 import utilities
 import animation
 from equipment import *
@@ -27,19 +29,20 @@ class Fighter(pygame.sprite.Sprite):
         ).copy()  # set naked body sprite as base image
         self.world = world
         self.rect = self.image.get_rect()
-        self.rect.center = (spawnPos,)
-        self.enemyDetectionAreaSize = 10
+        self.rect.center = (spawnPos)
+        self.enemyDetectionAreaSize = random.randint(self.rect.w, 400)
         self.dir = 45
         self.speed = speed + random.randint(10, 30) / 10
         self.state = CharacterStates.idle
-        self.searchInterval = random.randint(10, 15)
+        self.searchInterval = random.randint(30, 70)
+        self.searchLength = random.randint(80, 100)
+        self.target = None
         self.team = team
         self.health = 100
         self.target = None
         self.frame = 0
         self.animFrame = 0
         self.advAnim = True
-        self.lastHitArea = pygame.Rect((0, 0), (0, 0))
         self.equipment = {}
         self.moved_in_step = 0
         self.anim = {
@@ -111,10 +114,15 @@ class Fighter(pygame.sprite.Sprite):
 
         self.timeStamps[CharacterStates.search] = self.frame
         if len(colliders) > 0:
-            return(colliders[0].rect)
+            return(random.choice(colliders).rect)
         else:
             return pygame.Rect(
                 self.world.fighterInputs[self.team["primaryTarget"]], (20, 20)
+                # (
+                #     random.randint(20 , 1200),
+                #     random.randint(20, 400)
+                # ),
+                # (20, 20)
             )
 
     def move(self):
@@ -173,7 +181,8 @@ class Fighter(pygame.sprite.Sprite):
 
     def die(self):
         skeletonColors = [(155, 155, 105), (55, 55, 55)]
-        i = 0
+        i = self.rect.width / 2
+
         for sColor in skeletonColors:
             i += 1
             bones = utilities.tintImage(self.image, sColor)
@@ -185,28 +194,28 @@ class Fighter(pygame.sprite.Sprite):
         self.state = CharacterStates.dead
 
     def hit(self, distance):
-        hit = False
         weapon = self.equipment.get("weapon", None)
-        self.timeStamps["hit"] = self.frame
 
         # 1. define hit area
-        self.lastHitArea = pygame.Rect((100, 100), (distance, distance))
-        self.lastHitArea.center = utilities.angleDistToPos(
+        hit_area = pygame.Rect((100, 100), (distance, distance))
+        hit_area.center = utilities.angleDistToPos(
             self.rect.center, self.dir, distance
         )
 
-        # 2. find players in the area
-        enemiesInArea = [] # TODO: Use Detector
-        for p in self.world.fighterSprites[self.team["enemy_name"]]:
-            if self.lastHitArea.colliderect(p.rect) and p.state != "DEAD":
-                enemiesInArea.append(p)
+        # 2. find fighters in reach
+        enemies_in_reach = self.world.fighter_detector.detect(
+            self.world.fighterSprites[self.team["enemy_name"]],
+            self.rect,
+            distance,
+        )
 
-        # 3. deal damage to players
-        if weapon:
-            for e in enemiesInArea:
-                e.takeHit(weapon.hit, self.dir)
-                hit = True
-        return hit
+        # 3. deal damage to fighters
+        if weapon and enemies_in_reach:
+            self.timeStamps["hit"] = self.frame
+            for enemy in enemies_in_reach:
+                enemy.takeHit(weapon.hit, self.dir)
+            return(True)
+        return(False)
 
     def step(self, frame):
         self.frame = frame
@@ -227,13 +236,16 @@ class Fighter(pygame.sprite.Sprite):
             self.state = CharacterStates.search
 
         if self.state == CharacterStates.search:
-            self.target = self.findTarget()
-            self.dir = utilities.angleTo(self.rect.center, self.target.center)
-            self.state = CharacterStates.move
+            if self.frame - self.timeStamps[CharacterStates.search] >= self.searchLength:
+                self.target = self.findTarget()
+                self.searchStartedFrame = self.frame
+                if self.target:
+                    self.dir = utilities.angleTo(self.rect.center, self.target.center)
+                self.state = CharacterStates.move
 
         if not self.target:
             target = self.world.fighterInputs[self.team["primaryTarget"]]
-            self.target = pygame.Rect(target, (3, 3))
+            self.target = pygame.Rect(target, (24, 24))
 
         dist = utilities.distTo(self.rect.center, self.target.center)
         angle = utilities.angleTo(self.rect.center, self.target.center)

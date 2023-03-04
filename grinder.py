@@ -3,11 +3,12 @@ import utilities
 
 
 class Grinder:
-    def __init__(self, teams, debug=False):
+    def __init__(self, teams):
         print("grinder init")
-        self.debug = debug
+        pygame.font.init()
         self.last_step_time = time.time()
         self.surface = pygame.Surface((1200, 480))
+        self.debug_layer_enabled = False
         self.debugLayer = pygame.Surface(self.surface.get_rect().size)
         self.debugLayer.set_colorkey((255, 0, 255))
         self.debugLayer.fill((255, 0, 255))
@@ -16,6 +17,7 @@ class Grinder:
         self.bloodNcorpseLayer.set_colorkey((255, 0, 255))
         self.bloodDropLayer = pygame.Surface(self.surface.get_rect().size)
         self.bloodDropLayer.set_colorkey((0, 0, 0))
+        self.font = pygame.font.SysFont("Monotype", 12)
         self.fighter_detector = utilities.Detector()
         self.fighters = []
         self.fighterSprites = {
@@ -92,6 +94,36 @@ class Grinder:
         pygame.Surface.blit(self.surface, self.bloodNcorpseLayer, [0, 0])
         pygame.Surface.blit(self.surface, self.bloodDropLayer, [0, 0])
 
+    def drawDebugLayer(self):
+        # Clear canvas
+        self.debugLayer.fill((255, 0, 255))
+
+        for fighter in self.fighters:
+            # target line
+            if fighter.target:
+                pygame.draw.line(
+                    fighter.world.debugLayer,
+                    (20, 10, 40),
+                    (fighter.rect.center[0], fighter.rect.center[1]),
+                    (fighter.target.center[0], fighter.target.center[1]),
+                    1,
+                )
+
+            # health bar
+            x, y = fighter.rect.bottomleft
+            pygame.draw.line(
+                fighter.world.debugLayer,
+                (20, 130, 30),
+                (x, y),
+                (x + (fighter.health / 100) * fighter.rect.width, y),
+                3,
+            )
+
+            # state text
+            textsurface = self.font.render(fighter.state, False, (0, 0, 0))
+            x, y = fighter.rect.bottomleft
+            fighter.world.debugLayer.blit(textsurface, (x, y))
+
     def listEnemies(self, team_name):
         """
         List enemy fighters for a given team.
@@ -100,6 +132,6 @@ class Grinder:
 
     def render(self):
         self.drawBlood()
-        utilities.drawDebugLayer(self)
+        self.drawDebugLayer()
         for name, team in self.fighterSprites.items():
             team.draw(self.surface)

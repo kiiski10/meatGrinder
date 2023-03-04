@@ -1,9 +1,6 @@
 import math, time
 import pygame
 
-pygame.font.init()
-font = pygame.font.SysFont("Monotype", 12)
-
 
 def distTo(fromPos, toPos):
     dist = math.sqrt((fromPos[0] - toPos[0]) ** 2 + (fromPos[1] - toPos[1]) ** 2)
@@ -74,44 +71,6 @@ def tilePosId(pos):
     return "{:.0f}x{:.0f}".format(pos[0], pos[1])
 
 
-def drawDebugLayer(grinder):
-    # Clear canvas
-    grinder.debugLayer.fill((255, 0, 255))
-
-    for fighter in grinder.fighters:
-        # target line
-        if fighter.target:
-            pygame.draw.line(
-                fighter.world.debugLayer,
-                (20, 10, 40),
-                (fighter.rect.center[0], fighter.rect.center[1]),
-                (fighter.target.center[0], fighter.target.center[1]),
-                1,
-            )
-
-        # hit marker
-        if fighter.lastHitArea:
-            pygame.draw.rect(
-                fighter.world.debugLayer, (200, 30, 30), fighter.lastHitArea, 0
-            )
-            fighter.lastHitArea = None
-
-        # health bar
-        x, y = fighter.rect.bottomleft
-        pygame.draw.line(
-            fighter.world.debugLayer,
-            (20, 130, 30),
-            (x, y),
-            (x + (fighter.health / 100) * fighter.rect.width, y),
-            3,
-        )
-
-        # state text
-        textsurface = font.render(fighter.state, False, (0, 0, 0))
-        x, y = fighter.rect.bottomleft
-        fighter.world.debugLayer.blit(textsurface, (x, y))
-
-
 def time_this(func):
     def wrapper_func(*args, **kwargs):
         start_time = time.time()
@@ -135,15 +94,15 @@ class Detector:
         self.detection_sprite = pygame.sprite.Sprite()
         self.detection_sprite.rect = self.detection_area
 
-    def detect(self, haystack, target_area, area_scale):
+    def detect(self, haystack, target_area, area_growth):
         """"
         Match detection_sprite to target_area and scale up depending on the fighter skill.
         Returns list of objects in haystack that collide with the detection_area
         """
-        self.detection_area.x = target_area.x * area_scale
-        self.detection_area.y = target_area.y * area_scale
-        self.detection_area.w = target_area.w * area_scale
-        self.detection_area.h = target_area.h * area_scale
+        self.detection_area.x = target_area.x + area_growth
+        self.detection_area.y = target_area.y + area_growth
+        self.detection_area.w = target_area.w + area_growth
+        self.detection_area.h = target_area.h + area_growth
         self.detection_area.center = target_area.center
 
         self.detection_sprite.rect.update(self.detection_area)
