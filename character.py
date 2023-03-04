@@ -42,20 +42,6 @@ class Fighter(pygame.sprite.Sprite):
         self.lastHitArea = pygame.Rect((0, 0), (0, 0))
         self.equipment = {}
         self.moved_in_step = 0
-
-        for e in selectedEquipment:
-            if e.category == "armor":
-                self.equipment["armor"] = e
-
-            elif e.category == "weapon":
-                self.equipment["weapon"] = e
-
-            else:
-                if not e.category in self.equipment:
-                    self.equipment[e.category] = [e]
-                else:
-                    self.equipment[e.category].append(e)
-
         self.anim = {
             "MOVE": {
                 "E": [],
@@ -70,6 +56,19 @@ class Fighter(pygame.sprite.Sprite):
             CharacterStates.move: 0,
             CharacterStates.search: 0,
         }
+
+        for e in selectedEquipment:                     # Give the fighter its gear
+            if e.category == "armor":
+                self.equipment["armor"] = e                 # - armor
+
+            elif e.category == "weapon":
+                self.equipment["weapon"] = e                # - weapon
+
+            else:
+                if not e.category in self.equipment:
+                    self.equipment[e.category] = [e]
+                else:
+                    self.equipment[e.category].append(e)    # - and everything else like 'clothing'
 
         # generate anim frames
         for d in animation.ANIM_MAPPING["directions"]:
