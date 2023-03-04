@@ -120,11 +120,26 @@ class Fighter(pygame.sprite.Sprite):
     def move(self):
         compass_dir = utilities.dirAsCompassDir(self.dir)
         self.image = self.anim["MOVE"][compass_dir][self.animFrame]
-        self.rect.center = utilities.angleDistToPos(
-            self.rect.center,
-            self.dir,
-            self.speed,
+        colliders = self.world.fighter_detector.detect(
+            self.world.fighterSprites[self.team["name"]],
+            self.rect,
+            5,
         )
+        if len(colliders) < 4: # It's not crowded. Move full speed
+            self.rect.center = utilities.angleDistToPos(
+                self.rect.center,
+                self.dir,
+                self.speed,
+            )
+        else: # Randomize moving dir if its crowded here
+            # TODO:
+            #    Add target_dir for fighters.
+            #    Limit changes of actual dir to x degrees per frame.
+            self.rect.center = utilities.angleDistToPos(
+                self.rect.center,
+                random.choice([self.dir - 45, self.dir + 45]),
+                self.speed,
+            )
 
     def takeHit(self, hit, angle):
         armor = self.equipment.get("armor", None)
