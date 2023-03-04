@@ -66,7 +66,6 @@ class Fighter(pygame.sprite.Sprite):
                 "S": [],
             }
         }
-
         self.timeStamps = {
             "hit": 0,
             CharacterStates.stun: 0,
@@ -104,21 +103,7 @@ class Fighter(pygame.sprite.Sprite):
             tile_pos_id,
             self.team["name"],
         ))
-    
 
-    def centerPoint(self):
-        return [
-            int(self.rect.center[0] + self.rect.width / 2),
-            int(self.rect.center[1] + self.rect.height / 2),
-        ]
-
-    def getDetectionRect(self):
-        w = self.enemyDetectionAreaSize
-        h = self.enemyDetectionAreaSize
-        r = pygame.Rect((0, 0), [w, h])
-        self.centerPoint()
-        r.center = self.centerPoint()
-        return r
 
     def findTarget(self):
         self.timeStamps[CharacterStates.search] = self.frame
@@ -141,7 +126,9 @@ class Fighter(pygame.sprite.Sprite):
             self.animFrame
         ]
         self.rect.center = utilities.angleDistToPos(
-            self.rect.center, self.dir, 0.6 * self.speed
+            self.rect.center,
+            self.dir,
+            self.speed,
         )
 
     def takeHit(self, hit, angle):

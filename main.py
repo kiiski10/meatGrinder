@@ -65,11 +65,11 @@ pygame.display.set_caption(
 
 def addFighter(team, spawnPos, speed, equipment): # TODO: move this to Grinder
     new_fighter = Fighter(
-            world=meatGrinder,
-            team=teams[team],
-            spawnPos=spawnPos,
-            speed=speed,
-            selectedEquipment=equipment,
+        world=meatGrinder,
+        team=teams[team],
+        spawnPos=spawnPos,
+        speed=speed,
+        selectedEquipment=equipment,
     )
     meatGrinder.fighters.append(new_fighter)
     meatGrinder.fighterSprites.add(new_fighter)

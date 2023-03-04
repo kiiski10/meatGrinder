@@ -48,7 +48,7 @@ class Factory:
         return tileCoords
 
     def step(self, step):
-        self.advanced_on_grinder_step = step   
+        self.advanced_on_grinder_step = step
         self.stats["step"] += 1
         self.prodLine.step()
 
