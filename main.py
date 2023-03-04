@@ -5,8 +5,6 @@ TARGET_LOOPS_PER_SEC = 130
 WINDOW_SIZE = [1700, 600]
 # FULLSCREEN = True
 FULLSCREEN = False
-DEBUG = True
-# DEBUG = False
 
 if FULLSCREEN:
     displaySurf = pygame.display.set_mode((0, 0), pygame.NOFRAME)
@@ -44,7 +42,7 @@ teams = {
 }
 
 clock = pygame.time.Clock()
-meatGrinder = Grinder(teams, debug=DEBUG)
+meatGrinder = Grinder(teams)
 factory = Factory(teams["orange"], meatGrinder)
 frame_counter = 0
 game_loop_counter = 0
@@ -91,6 +89,8 @@ def handleEvents():
             )
             if event.unicode == "Q" or event.scancode == 41:
                 return False
+            elif event.unicode.upper() == "D":
+                meatGrinder.debug_layer_enabled = not(meatGrinder.debug_layer_enabled)
     return True
 
 
@@ -102,6 +102,7 @@ def randomEquipments(n): # TODO: move this to Grinder
         if e not in selectedEquipment:
             selectedEquipment.append(e)
     return selectedEquipment
+
 
 # @utilities.time_this
 def game_step():
@@ -117,7 +118,7 @@ def game_step():
     surfaceXPos = meatGrinder.surface.get_width() + 10
 
     displaySurf.blit(meatGrinder.surface, (5, surfaceYPos))
-    if DEBUG:
+    if meatGrinder.debug_layer_enabled:
         displaySurf.blit(meatGrinder.debugLayer, (5, surfaceYPos))
 
     displaySurf.blit(factory.surface, (surfaceXPos, surfaceYPos))
