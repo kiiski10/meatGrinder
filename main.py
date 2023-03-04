@@ -148,9 +148,10 @@ while handleEvents():
     if time.time() - meatGrinder.last_step_time > game_loop_min_delay:
         frame_counter += 1
 
-        if random.randint(0, 100) < 10: # % chance to spawn new fighter on each round
-            speed = random.randint(20, 30) / 10.00
-            addFighter("blue", [24, 250], speed, randomEquipments(4))
+        if random.randint(0, 100) < 10: # % chance to spawn new fighter on each frame
+            speed = random.randint(10, 30) / 10.00
+            x_pos = random.randint(20, 400)
+            addFighter("blue", [24, x_pos], speed, randomEquipments(4))
 
         game_step()
 
