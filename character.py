@@ -28,9 +28,7 @@ class Fighter(pygame.sprite.Sprite):
         self.world = world
         self.rect = self.image.get_rect()
         self.rect.center = (spawnPos,)
-        # self.rect.x += random.randint(-48, 48)
-        # self.rect.y = random.randint(-48, 48)
-        self.enemyDetectionAreaSize = 400
+        self.enemyDetectionAreaSize = 10
         self.dir = 45
         self.speed = speed + random.randint(10, 30) / 10
         self.state = CharacterStates.idle
@@ -106,25 +104,23 @@ class Fighter(pygame.sprite.Sprite):
 
 
     def findTarget(self):
+        colliders = self.world.fighter_detector.detect(
+            self.world.fighterSprites[self.team["enemy_name"]],
+            self.rect,
+            self.enemyDetectionAreaSize,
+        )
+
         self.timeStamps[CharacterStates.search] = self.frame
-        enemyRects = []
-        for e in self.world.enemiesOf[self.team["name"]]:
-            enemyRects.append(e.rect)
-
-        dr = self.getDetectionRect()
-        index = dr.collidelist(enemyRects)
-
-        if index != -1:
-            return enemyRects[index]
+        if len(colliders) > 0:
+            return(colliders[0].rect)
         else:
             return pygame.Rect(
                 self.world.fighterInputs[self.team["primaryTarget"]], (20, 20)
             )
 
     def move(self):
-        self.image = self.anim["MOVE"][utilities.dirAsCompassDir(self.dir)][
-            self.animFrame
-        ]
+        compass_dir = utilities.dirAsCompassDir(self.dir)
+        self.image = self.anim["MOVE"][compass_dir][self.animFrame]
         self.rect.center = utilities.angleDistToPos(
             self.rect.center,
             self.dir,
@@ -151,7 +147,7 @@ class Fighter(pygame.sprite.Sprite):
 
         for d in range(bloodAmount):
             self.world.addBloodDrop(
-                pos=self.centerPoint(),
+                pos=self.rect.center,
                 dir=angle + random.randint(-10, 10),
                 damage=force + random.randint(7, 10),
                 color=(
@@ -171,7 +167,7 @@ class Fighter(pygame.sprite.Sprite):
                 bones, (self.rect.center[0] - i, self.rect.center[1] - i)
             )
         self.world.fighters.remove(self)
-        self.world.fighterSprites.remove(self)
+        self.world.fighterSprites[self.team["name"]].remove(self)
         self.state = CharacterStates.dead
 
     def hit(self, distance):
@@ -182,12 +178,12 @@ class Fighter(pygame.sprite.Sprite):
         # 1. define hit area
         self.lastHitArea = pygame.Rect((100, 100), (distance, distance))
         self.lastHitArea.center = utilities.angleDistToPos(
-            self.centerPoint(), self.dir, distance
+            self.rect.center, self.dir, distance
         )
 
         # 2. find players in the area
-        enemiesInArea = []
-        for p in self.world.enemiesOf[self.team["name"]]:
+        enemiesInArea = [] # TODO: Use Detector
+        for p in self.world.fighterSprites[self.team["enemy_name"]]:
             if self.lastHitArea.colliderect(p.rect) and p.state != "DEAD":
                 enemiesInArea.append(p)
 

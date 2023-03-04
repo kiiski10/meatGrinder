@@ -23,6 +23,7 @@ from character import Fighter
 teams = {
     "orange": {
         "name": "orange",
+        "enemy_name": "blue",
         "color": (255, 87, 20),
         "fighterInputs": [
             "0x0",
@@ -32,6 +33,7 @@ teams = {
     },
     "blue": {
         "name": "blue",
+        "enemy_name": "orange",
         "color": (25, 175, 255),
         "fighterInputs": [
             "2x2",
@@ -72,7 +74,7 @@ def addFighter(team, spawnPos, speed, equipment): # TODO: move this to Grinder
         selectedEquipment=equipment,
     )
     meatGrinder.fighters.append(new_fighter)
-    meatGrinder.fighterSprites.add(new_fighter)
+    meatGrinder.fighterSprites[team].add(new_fighter)
 
 
 def handleEvents():

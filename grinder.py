@@ -16,14 +16,14 @@ class Grinder:
         self.bloodNcorpseLayer.set_colorkey((255, 0, 255))
         self.bloodDropLayer = pygame.Surface(self.surface.get_rect().size)
         self.bloodDropLayer.set_colorkey((0, 0, 0))
+        self.fighter_detector = utilities.Detector()
         self.fighters = []
-        self.fighterSprites = pygame.sprite.Group()
+        self.fighterSprites = {
+            "orange": pygame.sprite.Group(),
+            "blue": pygame.sprite.Group(),
+        }
         self.teams = teams
         self.bloodDrops = []
-        self.teamsFilteredOn = 0
-        self.enemiesOf = {}
-        for t in self.teams:
-            self.enemiesOf[t] = []
         self.step_count = 0
         self.fighterInputs = {
             "0x0": [1160, 0],
@@ -36,22 +36,13 @@ class Grinder:
         self.step_count += 1
         self.last_step_time = time.time()
 
-        if self.step_count - self.teamsFilteredOn > 10:
-            self.teamsFilteredOn = self.step_count
-
-            for t in self.teams:
-                self.enemiesOf[t] = []
-
-            for t in self.teams:
-                self.enemiesOf[t] = self.listEnemies(t)
-
         for f in self.fighters:
             f.step(self.step_count)
 
     def addBloodDrop(self, pos=None, dir=None, damage=None, color=None):
         if None in [pos, dir, damage, color]:
             raise Exception("Can't add blood!")
-        
+
         if len(self.bloodDrops) > 1000:  # limit drawing of blood
             draw = random.randint(0, 9) < 4  # 40% chance to draw if over 1000 drops
         else:
@@ -110,4 +101,5 @@ class Grinder:
     def render(self):
         self.drawBlood()
         utilities.drawDebugLayer(self)
-        self.fighterSprites.draw(self.surface)
+        for name, team in self.fighterSprites.items():
+            team.draw(self.surface)

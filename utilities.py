@@ -122,3 +122,37 @@ def time_this(func):
             run_time=round((time.time() - start_time) * 1000, 6),     # ms
         ))
     return wrapper_func
+
+
+class Detector:
+    def __init__(self):
+        self.detection_area = pygame.Rect(
+            0, # left
+            0, # top
+            0, # width
+            0, # heigh
+        )
+        self.detection_sprite = pygame.sprite.Sprite()
+        self.detection_sprite.rect = self.detection_area
+
+    def detect(self, haystack, target_area, area_scale):
+        """"
+        Match detection_sprite to target_area and scale up depending on the fighter skill.
+        Returns list of objects in haystack that collide with the detection_area
+        """
+        self.detection_area.x = target_area.x * area_scale
+        self.detection_area.y = target_area.y * area_scale
+        self.detection_area.w = target_area.w * area_scale
+        self.detection_area.h = target_area.h * area_scale
+        self.detection_area.center = target_area.center
+
+        self.detection_sprite.rect.update(self.detection_area)
+
+        collider_dict = pygame.sprite.groupcollide(
+                [self.detection_sprite],
+                haystack,
+                False,
+                False
+            )
+        collider_list = collider_dict.get(self.detection_sprite, [])
+        return(collider_list)
