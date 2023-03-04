@@ -41,26 +41,19 @@ teams = {
     },
 }
 
-clock = pygame.time.Clock()
-meatGrinder = Grinder(teams)
-factory = Factory(teams["orange"], meatGrinder)
-frame_counter = 0
-game_loop_counter = 0
-game_loop_min_delay = 0.014 # 0.014 = max 60 loops per sec
-steps_per_sec_timer = time.time()
-
-winTitleExtraText = "SPD:{}/{} | FPS:{} | BLOOD:{} | STEP:{}".format(
-    game_loop_counter,
-    TARGET_LOOPS_PER_SEC,
-    frame_counter,
-    len(meatGrinder.bloodDrops),
-    meatGrinder.step_count,
-)
-pygame.display.set_caption(
-    "MeatGrinder | {}".format(
-        winTitleExtraText
+def init_game():
+    clock = pygame.time.Clock()
+    meatGrinder = Grinder(teams)
+    factory = Factory(teams["orange"], meatGrinder)
+    frame_counter = 0
+    game_loop_counter = 0
+    game_loop_min_delay = 0.014 # 0.014 = max 60 loops per sec
+    steps_per_sec_timer = time.time()
+    return(
+        clock, meatGrinder, factory,
+        frame_counter, game_loop_counter,
+        game_loop_min_delay, steps_per_sec_timer,
     )
-)
 
 
 def addFighter(team, spawnPos, speed, equipment): # TODO: move this to Grinder
@@ -87,10 +80,12 @@ def handleEvents():
                     key["unicode"], key["scancode"]
                 )
             )
-            if event.unicode == "Q" or event.scancode == 41:
+            if event.unicode.upper() == "Q" or event.scancode == 41: # 41 = ESC
                 return False
             elif event.unicode.upper() == "D":
                 meatGrinder.debug_layer_enabled = not(meatGrinder.debug_layer_enabled)
+            elif event.unicode.upper() == "R":
+                return("RESET")   # Reset game state
     return True
 
 
@@ -125,7 +120,22 @@ def game_step():
     pygame.display.flip()
 
 
-while handleEvents():
+(
+    clock, meatGrinder, factory,
+    frame_counter, game_loop_counter,
+    game_loop_min_delay, steps_per_sec_timer
+) = init_game()
+
+while True:
+    event_handler_status = handleEvents()
+    if not event_handler_status:
+        break
+    if event_handler_status == "RESET":
+        (
+            clock, meatGrinder, factory,
+            frame_counter, game_loop_counter,
+            game_loop_min_delay, steps_per_sec_timer
+        ) = init_game()
     game_loop_counter += 1
 
     # Update window title
@@ -151,7 +161,8 @@ while handleEvents():
 
         if random.randint(0, 100) < 10: # % chance to spawn new fighter on each frame
             speed = random.randint(10, 30) / 10.00
-            x_pos = random.randint(20, 400)
+            #x_pos = random.randint(20, 400)
+            x_pos = 220
             addFighter("blue", [24, x_pos], speed, randomEquipments(4))
 
         game_step()
