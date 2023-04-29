@@ -114,16 +114,10 @@ class Fighter(pygame.sprite.Sprite):
 
         self.timeStamps[CharacterStates.search] = self.frame
         if len(colliders) > 0:
-            return(random.choice(colliders).rect)
+            return(random.choice(colliders))
         else:
-            return pygame.Rect(
-                self.world.fighterInputs[self.team["primaryTarget"]], (20, 20)
-                # (
-                #     random.randint(20 , 1200),
-                #     random.randint(20, 400)
-                # ),
-                # (20, 20)
-            )
+            location_str = self.team["primaryTarget"]
+            return(self.world.tile_map[self.world.fighterInputs[location_str]])
 
     def move(self):
         compass_dir = utilities.dirAsCompassDir(self.dir)
@@ -217,7 +211,7 @@ class Fighter(pygame.sprite.Sprite):
             return(True)
         return(False)
 
-    def step(self, frame):
+    def step(self, frame, open_map):
         self.frame = frame
         weapon = self.equipment.get("weapon", None)
 
@@ -240,15 +234,15 @@ class Fighter(pygame.sprite.Sprite):
                 self.target = self.findTarget()
                 self.searchStartedFrame = self.frame
                 if self.target:
-                    self.dir = utilities.angleTo(self.rect.center, self.target.center)
+                    self.dir = utilities.angleTo(self.rect.center, self.target.rect.center)
                 self.state = CharacterStates.move
 
         if not self.target:
             target = self.world.fighterInputs[self.team["primaryTarget"]]
-            self.target = pygame.Rect(target, (24, 24))
+            self.target = self.world.tile_map[target]
 
-        dist = utilities.distTo(self.rect.center, self.target.center)
-        angle = utilities.angleTo(self.rect.center, self.target.center)
+        dist = utilities.distTo(self.rect.center, self.target.rect.center)
+        angle = utilities.angleTo(self.rect.center, self.target.rect.center)
 
         if self.state == CharacterStates.idle:
             self.state = CharacterStates.search

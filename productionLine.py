@@ -38,7 +38,7 @@ class Section:
     def next_section(self):
         possible_outputs = self.possible_outputs()
         if self.selected_input in possible_outputs:
-            possible_outputs.remove(self.selected_input)       
+            possible_outputs.remove(self.selected_input)
         if possible_outputs:
             section = random.choice(possible_outputs)
         else:
@@ -117,7 +117,8 @@ class ProductionLine:
                         output.selected_input = section
 
     def move_fighter_to_grinder(self, fighter, gate_section):
-        fighter.rect.center = gate_section.output_gate_target
+        if not gate_section: return
+        fighter.rect.center = self.factory.grinder.tile_map[gate_section.output_gate_target].rect.center
         self.factory.grinder.fighters.append(fighter)
         self.factory.grinder.fighterSprites[fighter.team["name"]].add(fighter) # TODO: move this to add_fighter method in Grinder
         gate_section.fighters_here.remove(fighter)
@@ -125,11 +126,13 @@ class ProductionLine:
 
     def step(self):
         self.stats["step"] += 1
-        if time.time() - self.stats["last_step_time"] > 0.25:
-            self.stats["last_step_time"] = time.time()
-            self.lineAdvance()
 
         for gate in self.outGates:
             gate_section = self.line[utilities.tilePosId(gate)]
             for fighter in gate_section.fighters_here:
                 self.move_fighter_to_grinder(fighter, gate_section)
+
+        if time.time() - self.stats["last_step_time"] > 0.25:
+            self.stats["last_step_time"] = time.time()
+            self.lineAdvance()
+

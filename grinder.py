@@ -2,8 +2,33 @@ import pygame, random, time
 import utilities
 
 
+class GrinderMapTileNode:
+    def __init__(self, grinder, x, y):
+        self.grinder = grinder
+        self.cached_fighters = []
+        self.x = x
+        self.y = y
+        self.occupancy = "EMPTY"
+        self.tile_size = self.grinder.tile_size
+        self.rect = pygame.Rect(0, 0, self.tile_size, self.tile_size)
+        self.rect.bottomright = [
+            x * self.tile_size,
+            y * self.tile_size
+        ]
+
+    def __str__(self):
+        return("GrinderMapTileNode@{}x{}".format(self.x, self.y))
+
+    def fighters(self):
+        fighters_on_tile = [
+            f for f in self.grinder.fighters
+                if self.rect.collidepoint(f.rect.center)
+        ]
+        return(fighters_on_tile)
+
+
 class Grinder:
-    def __init__(self, teams):
+    def __init__(self, teams, tile_size):
         print("grinder init")
         pygame.font.init()
         self.last_step_time = time.time()
@@ -20,26 +45,55 @@ class Grinder:
         self.font = pygame.font.SysFont("Monotype", 12)
         self.fighter_detector = utilities.Detector()
         self.fighters = []
+        self.teams = teams
+        self.bloodDrops = []
+        self.step_count = 0
+        self.tile_size = tile_size
+
         self.fighterSprites = {
             "orange": pygame.sprite.Group(),
             "blue": pygame.sprite.Group(),
         }
-        self.teams = teams
-        self.bloodDrops = []
-        self.step_count = 0
+
+        x, y = self.surface.get_rect().size
+        map_width = int(x / self.tile_size)
+        map_height = int(y / self.tile_size)
+
+        self.tile_map = {}
+        for y in range(1, map_height +1):   # Generate path map with EMPTY nodes
+            self.tile_map.update({"{}x{}".format(x, y): GrinderMapTileNode(self, x, y) for x in range(1, map_width +1)})
+
+        self.tile_render_order = sorted(self.tile_map, key=lambda x: x.split("x")[1])
+
         self.fighterInputs = {
-            "0x0": [1160, 0],
-            "0x9": [1160, 430],
-            "2x2": [10, 200],
-            "2x2": [10, 200],
+            "0x0": "25x1",   #  factory out: grinder in
+            "0x9": "25x10",
+            "5x5": "1x5",
+        }
+
+        self.path_finding_costs = {
+            "EMPTY": 0,
+            "FIGHTER": 20,
+            "BLOCK": 100,
         }
 
     def step(self):
         self.step_count += 1
         self.last_step_time = time.time()
 
-        for f in self.fighters:
-            f.step(self.step_count)
+        # Detect player positions and construct 'open map' for path finding
+        for location_str, tile_node in self.tile_map.items():
+            tile_node.cached_fighters = tile_node.fighters()
+
+        open_map = {
+            location_str: tile_node
+                for location_str, tile_node in self.tile_map.items()
+                    if not tile_node.cached_fighters
+        }
+
+        for location_str, tile_node in self.tile_map.items():
+            for f in tile_node.cached_fighters:
+                f.step(self.step_count, open_map)
 
     def addBloodDrop(self, pos=None, dir=None, damage=None, color=None):
         if None in [pos, dir, damage, color]:
@@ -105,7 +159,7 @@ class Grinder:
                     fighter.world.debugLayer,
                     (20, 10, 40),
                     (fighter.rect.center[0], fighter.rect.center[1]),
-                    (fighter.target.center[0], fighter.target.center[1]),
+                    (fighter.target.rect.center[0], fighter.target.rect.center[1]),
                     1,
                 )
 
@@ -133,5 +187,21 @@ class Grinder:
     def render(self):
         self.drawBlood()
         self.drawDebugLayer()
-        for name, team in self.fighterSprites.items():
-            team.draw(self.surface)
+
+        # # Draw fighters by team and sprite group
+        # for name, team in self.fighterSprites.items():
+        #     team.draw(self.surface)
+
+        # Draw fighters individually in layers (propably slower)
+        for location_str in self.tile_render_order:
+            tile = self.tile_map[location_str]
+            for f in tile.cached_fighters:
+                pygame.Surface.blit(
+                    self.surface,
+                    f.image,
+                    [
+                        f.rect.x,
+                        f.rect.y
+                    ],
+                )
+

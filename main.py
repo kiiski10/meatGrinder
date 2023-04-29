@@ -5,6 +5,7 @@ TARGET_LOOPS_PER_SEC = 130
 WINDOW_SIZE = [1700, 600]
 # FULLSCREEN = True
 FULLSCREEN = False
+TILE_SIZE = 48
 
 if FULLSCREEN:
     displaySurf = pygame.display.set_mode((0, 0), pygame.NOFRAME)
@@ -24,26 +25,25 @@ teams = {
         "enemy_name": "blue",
         "color": (255, 87, 20),
         "fighterInputs": [
-            "0x0",
-            "0x9",
+            "1x1",
+            "1x10",
         ],
-        "primaryTarget": "2x2",
+        "primaryTarget": "5x5",
     },
     "blue": {
         "name": "blue",
         "enemy_name": "orange",
         "color": (25, 175, 255),
         "fighterInputs": [
-            "2x2",
-            "2x2",
+            "2x5",
         ],
-        "primaryTarget": "0x0",
+        "primaryTarget": "0x9",
     },
 }
 
 def init_game():
     clock = pygame.time.Clock()
-    meatGrinder = Grinder(teams)
+    meatGrinder = Grinder(teams, TILE_SIZE)
     factory = Factory(teams["orange"], meatGrinder)
     frame_counter = 0
     game_loop_counter = 0
