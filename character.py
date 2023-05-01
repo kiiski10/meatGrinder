@@ -91,7 +91,7 @@ class Fighter(pygame.sprite.Sprite):
                         newFrame.blit(self.equipment[c].anim[d][fn], [0, 0])
                     if c == "armor":
                         newFrame.blit(self.equipment[c].anim[d][fn], [0, 0])
-                newFrame = utilities.changeColor(newFrame, self.team["color"])
+                newFrame = utilities.changeColor(newFrame, self.team.color)
                 frames.append(newFrame)
                 fn += 1
 
@@ -107,24 +107,38 @@ class Fighter(pygame.sprite.Sprite):
 
 
     def findTarget(self):
+        self.timeStamps[CharacterStates.search] = self.frame
+        fallback_target = self.world.tile_map[self.team.fallback_target]
+
         colliders = self.world.fighter_detector.detect(
-            self.world.fighterSprites[self.team["enemy_name"]],
+            self.world.fighterSprites[self.team.enemy_name],
             self.rect,
             self.enemyDetectionAreaSize,
         )
 
-        self.timeStamps[CharacterStates.search] = self.frame
-        if len(colliders) > 0:
-            return(random.choice(colliders))
-        else:
-            location_str = self.team["primaryTarget"]
-            return(self.world.tile_map[self.world.fighterInputs[location_str]])
+        if colliders == []:
+            return(fallback_target)
+        elif len(colliders) == 1:
+            collider = colliders[0]
+        elif len(colliders) > 1:
+            collider = random.choice(colliders)
+
+        tile_pos = utilities.screenPosToTilePos(self.world.tile_size, collider.rect.center)
+        location_str = utilities.tilePosId(tile_pos)
+
+        try:
+            tile = self.world.tile_map[location_str]
+            return(tile)
+        except KeyError as e:
+            print("'{}': Can't set target outside of tilemap: {}".format(self.team.name, str(e)))
+            return(fallback_target)
+
 
     def move(self):
         compass_dir = utilities.dirAsCompassDir(self.dir)
         self.image = self.anim["MOVE"][compass_dir][self.animFrame]
         colliders = self.world.fighter_detector.detect(
-            self.world.fighterSprites[self.team["name"]],
+            self.world.fighterSprites[self.team.name],
             self.rect,
             5,
         )
@@ -185,7 +199,7 @@ class Fighter(pygame.sprite.Sprite):
                 bones, (self.rect.center[0] - i, self.rect.center[1] - i)
             )
         self.world.fighters.remove(self)
-        self.world.fighterSprites[self.team["name"]].remove(self)
+        self.world.fighterSprites[self.team.name].remove(self)
         self.state = CharacterStates.dead
 
     def hit(self, distance):
@@ -199,7 +213,7 @@ class Fighter(pygame.sprite.Sprite):
 
         # 2. find fighters in reach
         enemies_in_reach = self.world.fighter_detector.detect(
-            self.world.fighterSprites[self.team["enemy_name"]],
+            self.world.fighterSprites[self.team.enemy_name],
             self.rect,
             distance,
         )
@@ -247,7 +261,7 @@ class Fighter(pygame.sprite.Sprite):
                 self.state = CharacterStates.move
 
         if not self.target:
-            target = self.world.fighterInputs[self.team["primaryTarget"]]
+            target = self.team.fallback_target
             self.target = self.world.tile_map[target]
 
         dist = utilities.distTo(self.rect.center, self.target.rect.center)

@@ -11,7 +11,7 @@ class GrinderMapTileNode:
         self.occupancy = "EMPTY"
         self.tile_size = self.grinder.tile_size
         self.rect = pygame.Rect(0, 0, self.tile_size, self.tile_size)
-        self.rect.bottomright = [
+        self.rect.topleft = [
             x * self.tile_size,
             y * self.tile_size
         ]
@@ -60,16 +60,10 @@ class Grinder:
         map_height = int(y / self.tile_size)
 
         self.tile_map = {}
-        for y in range(1, map_height +1):   # Generate path map with EMPTY nodes
-            self.tile_map.update({"{}x{}".format(x, y): GrinderMapTileNode(self, x, y) for x in range(1, map_width +1)})
+        for y in range(0, map_height):   # Generate path map with EMPTY nodes
+            self.tile_map.update({"{}x{}".format(x, y): GrinderMapTileNode(self, x, y) for x in range(0, map_width)})
 
         self.tile_render_order = sorted(self.tile_map, key=lambda x: x.split("x")[1])
-
-        self.fighterInputs = {
-            "0x0": "25x1",   #  factory out: grinder in
-            "0x9": "25x10",
-            "5x5": "1x5",
-        }
 
         self.path_finding_costs = {
             "EMPTY": 0,

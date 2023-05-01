@@ -34,6 +34,10 @@ class Factory:
         self.machineSurface.set_colorkey((255, 0, 255))
         self.fighterSurface.set_colorkey((255, 0, 255))
         self.inGate = self.getTilesByLayer("fighterIn")[0]
+        self.fighter_outputs = {
+            "0x0": "24x0",
+            "0x9": "24x9",
+        }
         self.prodLine = ProductionLine(self, self.inGate)
 
     def getTilesByLayer(self, layerName):

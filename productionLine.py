@@ -67,8 +67,8 @@ class ProductionLine:
         for tile_pos in self.factory.getTilesByLayer("prodLine"):
             newSection = Section(tile_pos, self)
             tile_pos_id = utilities.tilePosId(tile_pos)
-            if tile_pos_id in self.factory.grinder.fighterInputs:
-                output_pos = self.factory.grinder.fighterInputs[tile_pos_id]
+            if tile_pos_id in self.factory.fighter_outputs:
+                output_pos = self.factory.fighter_outputs[tile_pos_id]
                 newSection.output_gate_target = output_pos
             self.line[utilities.tilePosId(tile_pos)] = newSection
 
@@ -120,7 +120,7 @@ class ProductionLine:
         if not gate_section: return
         fighter.rect.center = self.factory.grinder.tile_map[gate_section.output_gate_target].rect.center
         self.factory.grinder.fighters.append(fighter)
-        self.factory.grinder.fighterSprites[fighter.team["name"]].add(fighter) # TODO: move this to add_fighter method in Grinder
+        self.factory.grinder.fighterSprites[fighter.team.name].add(fighter) # TODO: move this to add_fighter method in Grinder
         gate_section.fighters_here.remove(fighter)
         self.factory.fighterSprites.remove(fighter)
 

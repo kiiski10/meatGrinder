@@ -1,5 +1,5 @@
 import time, random, pygame
-import utilities
+
 TARGET_LOOPS_PER_SEC = 130
 
 WINDOW_SIZE = [1700, 600]
@@ -14,32 +14,40 @@ else:
 
 pygame.display.init()
 
-from equipment import *
-from grinder import Grinder
-from factory import Factory
 from character import Fighter
+from equipment import *
+from factory import Factory
+from grinder import Grinder
+from team import Team
 
-teams = {
-    "orange": {
+team_settings = [
+    {
         "name": "orange",
-        "enemy_name": "blue",
         "color": (255, 87, 20),
-        "fighterInputs": [
-            "1x1",
-            "1x10",
-        ],
-        "primaryTarget": "5x5",
+        "spawn_points": ["24x0","24x9"],
+        "enemy_name": "blue"
     },
-    "blue": {
+    {
         "name": "blue",
-        "enemy_name": "orange",
         "color": (25, 175, 255),
-        "fighterInputs": [
-            "2x5",
-        ],
-        "primaryTarget": "0x9",
+        "spawn_points": ["0x4"],
+        "enemy_name": "orange"
     },
-}
+]
+
+teams = {}
+for team in team_settings:
+    teams[team["name"]] = Team(
+        grinder=None,
+        name=team["name"],
+        color=team["color"],
+        spawn_points=team["spawn_points"],
+        enemy_name=team["enemy_name"]
+    )
+
+# Set fallback targets for teams
+teams["orange"].fallback_target = teams["blue"].spawn_points[0]
+teams["blue"].fallback_target = teams["orange"].spawn_points[0]
 
 def init_game():
     clock = pygame.time.Clock()
