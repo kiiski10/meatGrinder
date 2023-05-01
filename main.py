@@ -1,5 +1,5 @@
 import time, random, pygame
-from utilities import MouseHandler
+import utilities
 
 TARGET_LOOPS_PER_SEC = 130
 
@@ -107,8 +107,8 @@ def handleEvents(mouse_handler):
 
         elif event.type == 1026: # Mouse button up
             if event.button == 3:
-                mouse_handler.pos_down = ()
-                mouse_handler.pos_up = ()
+                mouse_handler.pos_down = None
+                mouse_handler.pos_up = None
             else:
                 mouse_handler.pos_up = event.pos
 
@@ -144,17 +144,26 @@ def game_step(mouse_handler):
 
     # Mouse debug
     start_pos = None
-    if mouse_handler.pos_up and mouse_handler.pos_down:
-        start_pos = mouse_handler.pos_up
-    elif mouse_handler.pos_down:
-        start_pos = mouse_handler.pos
+    end_pos = None
+
+    if mouse_handler.pos_down:
+        start_pos = mouse_handler.pos_down
+
+    if mouse_handler.pos_up:
+        end_pos = mouse_handler.pos_up
+        start_tile_pos = utilities.screenPosToTilePos(TILE_SIZE, start_pos)
+        goal_tile_pos = utilities.screenPosToTilePos(TILE_SIZE, end_pos)
+        path_to_mouse = utilities.find_path(meatGrinder.tile_map, start_tile_pos, goal_tile_pos)
+
+    if not end_pos:
+        end_pos = mouse_handler.pos
 
     if start_pos:
         pygame.draw.line(
             displaySurf,
             [242, 132, 45],
             start_pos,
-            mouse_handler.pos_down,
+            end_pos,
             5,
         )
 
@@ -168,7 +177,7 @@ def game_step(mouse_handler):
     game_loop_min_delay, steps_per_sec_timer
 ) = init_game()
 
-mouse_handler = MouseHandler()
+mouse_handler = utilities.MouseHandler()
 
 while True:
     event_handler_status = handleEvents(mouse_handler)

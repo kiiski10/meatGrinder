@@ -226,7 +226,7 @@ class Fighter(pygame.sprite.Sprite):
             return(True)
         return(False)
 
-    def step(self, frame, world):
+    def step(self, frame):
         self.frame = frame
         weapon = self.equipment.get("weapon", None)
 
