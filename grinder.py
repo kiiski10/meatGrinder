@@ -90,10 +90,13 @@ class Grinder:
                 for location_str, tile_node in self.tile_map.items()
                     if not tile_node.cached_fighters
         }
+        tiles_list = [1 if y.cached_fighters else 0 for x, y in self.tile_map.items()]
+        world = [tiles_list[x:x+25] for x in range(0, len(tiles_list), 25)]
 
         for location_str, tile_node in self.tile_map.items():
             for f in tile_node.cached_fighters:
-                f.step(self.step_count, open_map)
+                f.step(self.step_count, world)
+
 
     def addBloodDrop(self, pos=None, dir=None, damage=None, color=None):
         if None in [pos, dir, damage, color]:
@@ -151,6 +154,24 @@ class Grinder:
     def drawDebugLayer(self):
         # Clear canvas
         self.debugLayer.fill((255, 0, 255))
+
+        # Draw path to target
+        for fighter in self.fighters:
+            if fighter.path:
+                last_point = fighter.rect.center
+                for point in fighter.path:
+                    x, y = utilities.tilePosToScreenPos(self.tile_size, point)
+                    pygame.draw.line(
+                        fighter.world.debugLayer,
+                        (220, 20, 50),
+                        last_point,
+                        (x, y),
+                        1
+                    )
+                    last_point = (x, y)
+
+        # Draw AStar debug lines from mouse
+        # TODO
 
         for fighter in self.fighters:
             # target line

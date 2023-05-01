@@ -32,6 +32,7 @@ class Fighter(pygame.sprite.Sprite):
         self.rect.center = (spawnPos)
         self.enemyDetectionAreaSize = random.randint(self.rect.w, 400)
         self.dir = 45
+        self.path = []
         self.speed = speed + random.randint(10, 30) / 10
         self.state = CharacterStates.idle
         self.searchInterval = random.randint(30, 70)
@@ -211,7 +212,7 @@ class Fighter(pygame.sprite.Sprite):
             return(True)
         return(False)
 
-    def step(self, frame, open_map):
+    def step(self, frame, world):
         self.frame = frame
         weapon = self.equipment.get("weapon", None)
 
@@ -232,7 +233,15 @@ class Fighter(pygame.sprite.Sprite):
         if self.state == CharacterStates.search:
             if self.frame - self.timeStamps[CharacterStates.search] >= self.searchLength:
                 self.target = self.findTarget()
+                start = utilities.screenPosToTilePos(self.world.tile_size, self.rect.center)
+                goal = utilities.screenPosToTilePos(self.world.tile_size, self.target.rect.center)
                 self.searchStartedFrame = self.frame
+                # self.path = utilities.find_path(
+                #     world=world,
+                #     start=start,
+                #     goal=goal
+                # )
+
                 if self.target:
                     self.dir = utilities.angleTo(self.rect.center, self.target.rect.center)
                 self.state = CharacterStates.move

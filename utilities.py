@@ -1,5 +1,13 @@
+from astar.search import AStar
 import math, time
 import pygame
+
+
+def find_path(world=None, start=None, goal=None):
+    path_to_target = AStar(world).search(start, goal)
+    if not path_to_target:
+        return False
+    return path_to_target
 
 
 def distTo(fromPos, toPos):
