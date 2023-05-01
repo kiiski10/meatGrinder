@@ -84,13 +84,10 @@ class Grinder:
                 for location_str, tile_node in self.tile_map.items()
                     if not tile_node.cached_fighters
         }
-        tiles_list = [1 if y.cached_fighters else 0 for x, y in self.tile_map.items()]
-        world = [tiles_list[x:x+25] for x in range(0, len(tiles_list), 25)]
 
         for location_str, tile_node in self.tile_map.items():
             for f in tile_node.cached_fighters:
-                f.step(self.step_count, world)
-
+                f.step(self.step_count)
 
     def addBloodDrop(self, pos=None, dir=None, damage=None, color=None):
         if None in [pos, dir, damage, color]:

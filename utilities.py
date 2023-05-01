@@ -3,7 +3,10 @@ import math, time
 import pygame
 
 
-def find_path(world=None, start=None, goal=None):
+def find_path(tile_map=None, start=None, goal=None):
+    tile_list = [1 if y.cached_fighters else 0 for x, y in tile_map.items()]
+    world = [tile_list[x:x+10] for x in range(0, len(tile_list), 10)]
+
     path_to_target = AStar(world).search(start, goal)
     if not path_to_target:
         return False
