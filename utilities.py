@@ -123,3 +123,10 @@ class Detector:
             )
         collider_list = collider_dict.get(self.detection_sprite, [])
         return(collider_list)
+
+
+class MouseHandler:
+    def __init__(self):
+        self.pos = 0
+        self.pos_down = False
+        self.pos_up = False

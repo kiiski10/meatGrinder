@@ -1,4 +1,5 @@
 import time, random, pygame
+from utilities import MouseHandler
 
 TARGET_LOOPS_PER_SEC = 130
 
@@ -76,11 +77,12 @@ def addFighter(team, spawnPos, speed, equipment): # TODO: move this to Grinder
     meatGrinder.fighterSprites[team].add(new_fighter)
 
 
-def handleEvents():
+def handleEvents(mouse_handler):
     events = pygame.event.get()
     for event in events:
         if event.type == 256:  # Window close
             return False
+
         elif event.type == 768:  # Key down
             key = {"unicode": event.unicode, "scancode": event.scancode}
             print(
@@ -94,6 +96,22 @@ def handleEvents():
                 meatGrinder.debug_layer_enabled = not(meatGrinder.debug_layer_enabled)
             elif event.unicode.upper() == "R":
                 return("RESET")   # Reset game state
+
+        elif event.type == 1024: # Mouse motion
+            mouse_handler.pos = event.pos
+
+        elif event.type == 1025: # Mouse button down
+            if event.button == 1:
+                mouse_handler.pos_down = event.pos
+                mouse_handler.pos_up = ()
+
+        elif event.type == 1026: # Mouse button up
+            if event.button == 3:
+                mouse_handler.pos_down = ()
+                mouse_handler.pos_up = ()
+            else:
+                mouse_handler.pos_up = event.pos
+
     return True
 
 
@@ -108,7 +126,7 @@ def randomEquipments(n): # TODO: move this to Grinder
 
 
 # @utilities.time_this
-def game_step():
+def game_step(mouse_handler):
     displaySurf.fill((120, 120, 120))
 
     meatGrinder.step()
@@ -124,6 +142,22 @@ def game_step():
     if meatGrinder.debug_layer_enabled:
         displaySurf.blit(meatGrinder.debugLayer, (5, surfaceYPos))
 
+    # Mouse debug
+    start_pos = None
+    if mouse_handler.pos_up and mouse_handler.pos_down:
+        start_pos = mouse_handler.pos_up
+    elif mouse_handler.pos_down:
+        start_pos = mouse_handler.pos
+
+    if start_pos:
+        pygame.draw.line(
+            displaySurf,
+            [242, 132, 45],
+            start_pos,
+            mouse_handler.pos_down,
+            5,
+        )
+
     displaySurf.blit(factory.surface, (surfaceXPos, surfaceYPos))
     pygame.display.flip()
 
@@ -134,8 +168,10 @@ def game_step():
     game_loop_min_delay, steps_per_sec_timer
 ) = init_game()
 
+mouse_handler = MouseHandler()
+
 while True:
-    event_handler_status = handleEvents()
+    event_handler_status = handleEvents(mouse_handler)
     if not event_handler_status:
         break
     if event_handler_status == "RESET":
@@ -167,13 +203,13 @@ while True:
     if time.time() - meatGrinder.last_step_time > game_loop_min_delay:
         frame_counter += 1
 
-        if random.randint(0, 100) < 10: # % chance to spawn new fighter on each frame
+        if random.randint(0, 100) < 5: # % chance to spawn new fighter on each frame
             speed = random.randint(10, 30) / 10.00
-            #x_pos = random.randint(20, 400)
-            x_pos = 220
+            # x_pos = 220
+            x_pos = random.randint(20, 400)
             addFighter("blue", [24, x_pos], speed, randomEquipments(4))
 
-        game_step()
+        game_step(mouse_handler)
 
     clock.tick(TARGET_LOOPS_PER_SEC)
 
