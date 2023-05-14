@@ -1,16 +1,34 @@
 from astar.search import AStar
 import math, time
 import pygame
+import utilities
 
 
 def find_path(tile_map=None, start=None, goal=None):
-    tile_list = [1 if y.cached_fighters else 0 for x, y in tile_map.items()]
-    world = [tile_list[x:x+10] for x in range(0, len(tile_list), 10)]
+    map_width = 25
+    map_height = 10
+    path_to_target = None
 
-    path_to_target = AStar(world).search(start, goal)
-    if not path_to_target:
-        return False
-    return path_to_target
+    world = [] # TODO: cache this
+    for y in range(map_width):
+        row = []
+        for x in range(map_height):
+            tn = tile_map[utilities.tilePosId((y, x))] # astar module want's x and y this way
+            if len(tn.cached_fighters) > 0:
+                row.append(1)
+            else:
+                row.append(0)
+        world.append(row)
+
+    try:
+        path_to_target = AStar(world).search(start, goal)
+    except IndexError as e:
+        pass
+
+    if path_to_target:
+        return path_to_target
+
+    return False
 
 
 def distTo(fromPos, toPos):
