@@ -8,7 +8,6 @@ class GrinderMapTileNode:
         self.cached_fighters = []
         self.x = x
         self.y = y
-        self.occupancy = "EMPTY"
         self.tile_size = self.grinder.tile_size
         self.rect = pygame.Rect(0, 0, self.tile_size, self.tile_size)
         self.rect.topleft = [

@@ -72,8 +72,8 @@ def screenPosToTilePos(tileSize, pos):
 
 
 def tilePosToScreenPos(tileSize, pos):
-    x = (pos[0] * tileSize) + tileSize / 2
-    y = (pos[1] * tileSize) + tileSize / 2
+    x = int((pos[0] * tileSize) + tileSize / 2)
+    y = int((pos[1] * tileSize) + tileSize / 2)
     # print("tile pos to pixels {} -> {}x{}".format(pos, x,y))
     return (x, y)
 

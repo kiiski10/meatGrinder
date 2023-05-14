@@ -125,6 +125,17 @@ def randomEquipments(n): # TODO: move this to Grinder
     return selectedEquipment
 
 
+def text_surf(text, font):
+    return(
+        font.render(
+            text,
+            True, # Antialiasing
+            (40, 10, 240),
+            (220, 230, 220),
+        )
+    )
+
+
 # @utilities.time_this
 def game_step(mouse_handler):
     displaySurf.fill((120, 120, 120))
@@ -134,22 +145,21 @@ def game_step(mouse_handler):
         factory.step(meatGrinder.step_count)
         factory.render()
     meatGrinder.render()
+    factory_surf_x_pos = meatGrinder.surface.get_width() + 10
 
-    surfaceYPos = (displaySurf.get_height() - meatGrinder.surface.get_height()) / 2
-    surfaceXPos = meatGrinder.surface.get_width() + 10
-
-    displaySurf.blit(meatGrinder.surface, (5, surfaceYPos))
+    displaySurf.blit(meatGrinder.surface, (0, 0))
     if meatGrinder.debug_layer_enabled:
-        displaySurf.blit(meatGrinder.debugLayer, (5, surfaceYPos))
+        displaySurf.blit(meatGrinder.debugLayer, (0, 0))
 
     # Mouse debug
     start_pos = None
     end_pos = None
+    path_to_mouse = []
 
     if mouse_handler.pos_down:
         start_pos = mouse_handler.pos_down
 
-    if mouse_handler.pos_up:
+    if mouse_handler.pos_up and mouse_handler.pos_down:
         end_pos = mouse_handler.pos_up
         start_tile_pos = utilities.screenPosToTilePos(TILE_SIZE, start_pos)
         goal_tile_pos = utilities.screenPosToTilePos(TILE_SIZE, end_pos)
@@ -167,7 +177,47 @@ def game_step(mouse_handler):
             5,
         )
 
-    displaySurf.blit(factory.surface, (surfaceXPos, surfaceYPos))
+    # draw path debug lines
+    start_pos = None
+    if path_to_mouse:
+        for t in path_to_mouse:
+            end_pos = utilities.tilePosToScreenPos(TILE_SIZE, t)
+            if start_pos:
+                pygame.draw.line(
+                    displaySurf,
+                    [42, 232, 45],
+                    start_pos,
+                    end_pos,
+                    5,
+                )
+            start_pos = end_pos
+
+    # draw tile info
+    if mouse_handler.pos:
+        tile_pos = utilities.screenPosToTilePos(TILE_SIZE, mouse_handler.pos)
+        tile_id = utilities.tilePosId(tile_pos)
+        mouse_hover_tile_node = None
+        try:
+            mouse_hover_tile_node = meatGrinder.tile_map[tile_id]
+        except:
+            pass
+
+        if mouse_hover_tile_node:
+            hover_info_text = "{} {}".format(tile_id, len(mouse_hover_tile_node.cached_fighters))
+
+            displaySurf.blit(
+                text_surf(hover_info_text, small_font),
+                (mouse_hover_tile_node.rect.x, mouse_hover_tile_node.rect.y),
+            )
+
+            pygame.draw.rect(
+                displaySurf,
+                (240, 20, 100),
+                mouse_hover_tile_node.rect,
+                1,
+            )
+
+    displaySurf.blit(factory.surface, (factory_surf_x_pos, 0))
     pygame.display.flip()
 
 
@@ -177,6 +227,8 @@ def game_step(mouse_handler):
     game_loop_min_delay, steps_per_sec_timer
 ) = init_game()
 
+
+small_font = pygame.font.Font('freesansbold.ttf', 12)
 mouse_handler = utilities.MouseHandler()
 
 while True:
